@@ -1,7 +1,7 @@
 //  ButtonBarView.swift
 //  XLPagerTabStrip ( https://github.com/xmartlabs/XLPagerTabStrip )
 //
-//  Copyright (c) 2016 Xmartlabs ( http://xmartlabs.com )
+//  Copyright (c) 2017 Xmartlabs ( http://xmartlabs.com )
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,6 +37,12 @@ public enum SelectedBarAlignment {
     case progressive
 }
 
+public enum SelectedBarVerticalAlignment {
+    case top
+    case middle
+    case bottom
+}
+
 open class ButtonBarView: UICollectionView {
     
     open lazy var selectedBar: UIView = { [unowned self] in
@@ -47,9 +53,10 @@ open class ButtonBarView: UICollectionView {
     
     internal var selectedBarHeight: CGFloat = 4 {
         didSet {
-            updateSlectedBarYPosition()
+            updateSelectedBarYPosition()
         }
     }
+    var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
     var selectedBarAlignment: SelectedBarAlignment = .center
     var selectedIndex = 0
     
@@ -58,7 +65,7 @@ open class ButtonBarView: UICollectionView {
         addSubview(selectedBar)
     }
     
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
+    public override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         addSubview(selectedBar)
     }
@@ -165,10 +172,24 @@ open class ButtonBarView: UICollectionView {
         return contentOffset
     }
     
-    private func updateSlectedBarYPosition() {
+    private func updateSelectedBarYPosition() {
         var selectedBarFrame = selectedBar.frame
-        selectedBarFrame.origin.y = frame.size.height - selectedBarHeight
+        
+        switch selectedBarVerticalAlignment {
+        case .top:
+            selectedBarFrame.origin.y = 0
+        case .middle:
+            selectedBarFrame.origin.y = (frame.size.height - selectedBarHeight) / 2
+        case .bottom:
+            selectedBarFrame.origin.y = frame.size.height - selectedBarHeight
+        }
+        
         selectedBarFrame.size.height = selectedBarHeight
         selectedBar.frame = selectedBarFrame
+    }
+    
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        updateSelectedBarYPosition()
     }
 }
