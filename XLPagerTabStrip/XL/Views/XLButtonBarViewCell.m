@@ -27,36 +27,53 @@
 
 @interface XLButtonBarViewCell()
 
-@property IBOutlet UIImageView * imageView;
-@property IBOutlet UILabel * label;
+@property ASImageNode * imageView;
+@property ASTextNode * label;
 
 @end
 
 @implementation XLButtonBarViewCell
 
-- (void)willMoveToSuperview:(UIView *)newSuperview
-{
-    [super willMoveToSuperview:newSuperview];
-    
-    if (!self.label.superview){
-        // If label wasn't configured in a XIB or storyboard then it won't have
-        // been added to the view so we need to do it programmatically.
-        [self.contentView addSubview:self.label];
+- (instancetype)init {
+    self = [super init];
+    if(self) {
+        // Auto add subnodes
+        self.automaticallyManagesSubnodes = YES;
+        
+        _label = [[ASTextNode alloc] init];
+        _label.maximumNumberOfLines = 1;
+        
+        _imageView = [[ASImageNode alloc] init];
     }
+    return self;
 }
 
-- (UILabel *)label
-{
-    if (_label) return _label;
-    // If _label is nil then it wasn't configured in a XIB or storyboard so this
-    // class is being used programmatically. We need to initialise the label,
-    // setup some sensible defaults and set an appropriate frame.
-    // The label gets added to to the view in willMoveToSuperview:
-    _label = [[UILabel alloc] initWithFrame:self.contentView.bounds];
-    _label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _label.textAlignment = NSTextAlignmentCenter;
-    _label.font = [UIFont systemFontOfSize:14.0f weight:UIFontWeightMedium];
-    return _label;
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+//    if(_imageView.image) {
+//    // Label with image
+//    ASStackLayoutSpec *stackContent = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
+//                                                                              spacing:0.0f
+//                                                                       justifyContent:ASStackLayoutJustifyContentStart
+//                                                                           alignItems:ASStackLayoutAlignItemsStretch
+//                                                                             children:@[,
+//                                                                                        ]];
+//    }
+    
+//    // Main
+//    ASRatioLayoutSpec *ratioProfile = [ASRatioLayoutSpec ratioLayoutSpecWithRatio:1.0f
+//                                                                            child:self.profileImageNode];
+//    ratioProfile.style.width = ASDimensionMakeWithPoints(54.0f);
+//    
+//    stackContent.style.flexShrink = 1.0f;
+//    
+//    ASStackLayoutSpec *stackMain = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
+//                                                                           spacing:12.0f
+//                                                                    justifyContent:ASStackLayoutJustifyContentStart
+//                                                                        alignItems:ASStackLayoutAlignItemsStretch
+//                                                                          children:@[ratioProfile,
+//                                                                                     stackContent]];
+    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(10.0f, 12.0f, 12.0f, 12.0f)
+                                                  child:_label];
 }
 
 @end

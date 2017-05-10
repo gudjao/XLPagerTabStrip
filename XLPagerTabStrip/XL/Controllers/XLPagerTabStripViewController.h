@@ -26,6 +26,8 @@
 #import <UIKit/UITableViewController.h>
 #import <UIKit/UIKit.h>
 
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
+
 @class XLPagerTabStripViewController;
 
 /**
@@ -82,12 +84,13 @@ typedef NS_ENUM(NSUInteger, XLPagerTabStripDirection) {
 
 
 
-@interface XLPagerTabStripViewController : UIViewController <XLPagerTabStripViewControllerDelegate, XLPagerTabStripViewControllerDataSource, UIScrollViewDelegate>
+@interface XLPagerTabStripViewController : ASViewController <XLPagerTabStripViewControllerDelegate, XLPagerTabStripViewControllerDataSource, UIScrollViewDelegate, ASPagerDelegate, ASPagerDataSource, ASCollectionDelegate>
 
+// Properties
 @property (readonly) NSArray * pagerTabStripChildViewControllers;
-@property (nonatomic, retain) IBOutlet UIScrollView * containerView;
-@property (nonatomic, assign) IBOutlet id<XLPagerTabStripViewControllerDelegate> delegate;
-@property (nonatomic, assign) IBOutlet id<XLPagerTabStripViewControllerDataSource> dataSource;
+@property (nonatomic, retain) ASPagerNode * containerPagerNode;
+@property (nonatomic, assign) id<XLPagerTabStripViewControllerDelegate> delegate;
+@property (nonatomic, assign) id<XLPagerTabStripViewControllerDataSource> dataSource;
 
 @property (readonly) NSUInteger currentIndex;
 @property BOOL skipIntermediateViewControllers;

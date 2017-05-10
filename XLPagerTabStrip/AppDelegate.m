@@ -30,16 +30,27 @@
 
 #import "AppDelegate.h"
 
+#import "SampleViewController.h"
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    SampleViewController *mainController = [[SampleViewController alloc] init];
+    mainController.edgesForExtendedLayout = UIRectEdgeNone;
+    
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:mainController];
+    navController.title = @"Texture Sample";
+    
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = navController;
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    
     [[XLJSONSerialization sharedInstance] postsData];
     [[UITabBar appearance] setTintColor:[UIColor colorWithRed:0.027 green:0.725 blue:0.608 alpha:1]];
     [application setStatusBarStyle:UIStatusBarStyleLightContent];
     return YES;
-    
 }
-
 
 @end

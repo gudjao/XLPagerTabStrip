@@ -40,7 +40,7 @@ typedef NS_ENUM(NSUInteger, XLSelectedBarAlignment) {
     XLSelectedBarAlignmentProgressive
 };
 
-@interface XLButtonBarView : UICollectionView
+@interface XLButtonBarView : ASCollectionNode
 
 @property (readonly, nonatomic) UIView * selectedBar;
 @property (nonatomic) CGFloat selectedBarHeight;

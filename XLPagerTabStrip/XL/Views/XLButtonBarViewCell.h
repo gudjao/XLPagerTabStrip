@@ -23,11 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface XLButtonBarViewCell : UICollectionViewCell
+@interface XLButtonBarViewCell : ASCellNode
 
-@property (readonly, nonatomic) UIImageView * imageView;
-@property (readonly, nonatomic) UILabel * label;
+@property (readonly, nonatomic) ASImageNode * imageView;
+@property (readonly, nonatomic) ASTextNode * label;
 
 @end

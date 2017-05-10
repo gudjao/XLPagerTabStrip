@@ -26,9 +26,9 @@
 #import "XLButtonBarViewCell.h"
 #import "XLButtonBarPagerTabStripViewController.h"
 
-@interface XLButtonBarPagerTabStripViewController () <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface XLButtonBarPagerTabStripViewController () <ASCollectionDelegate, ASCollectionDataSource>
 
-@property (nonatomic) IBOutlet XLButtonBarView * buttonBarView;
+@property (nonatomic) XLButtonBarView * buttonBarView;
 @property (nonatomic) BOOL shouldUpdateButtonBarView;
 @property (nonatomic) NSArray *cachedCellWidths;
 @property (nonatomic) BOOL isViewAppearing;
@@ -58,6 +58,44 @@
     return self;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.shouldUpdateButtonBarView = YES;
+        
+        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+        flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 35, 0, 35);
+        _buttonBarView = [[XLButtonBarView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44.0f) collectionViewLayout:flowLayout];
+        _buttonBarView.backgroundColor = [UIColor orangeColor];
+        _buttonBarView.selectedBar.backgroundColor = [UIColor blackColor];
+        _buttonBarView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _buttonBarView.delegate = self;
+        _buttonBarView.dataSource = self;
+        
+        __weak typeof(self) weakSelf = self;
+        
+        self.node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+            NSLog(@"%f - %f", constrainedSize.max.width, constrainedSize.max.height);
+            
+            weakSelf.buttonBarView.style.preferredSize = CGSizeMake(constrainedSize.max.width, 44.0f);
+            weakSelf.containerPagerNode.style.preferredSize = constrainedSize.max;
+            weakSelf.containerPagerNode.style.flexShrink = 1.0f;
+            
+            ASStackLayoutSpec *buttonViewStack =
+            [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionVertical
+                                                    spacing:0.0f
+                                             justifyContent:ASStackLayoutJustifyContentStart
+                                                 alignItems:ASStackLayoutAlignItemsStretch
+                                                   children:@[weakSelf.buttonBarView,
+                                                              weakSelf.containerPagerNode]];
+            
+            return buttonViewStack;
+        };
+    }
+    return self;
+}
 
 #pragma mark - View Lifecycle
 
@@ -65,30 +103,30 @@
 {
     [super viewDidLoad];
     
-    if (!self.buttonBarView.superview){
+    if (!self.buttonBarView.view.superview){
         // If buttonBarView wasn't configured in a XIB or storyboard then it won't have
         // been added to the view so we need to do it programmatically.
-        [self.view addSubview:self.buttonBarView];
+        //[self.view addSubview:self.buttonBarView.view];
     }
     
-    if (!self.buttonBarView.delegate){
-        self.buttonBarView.delegate = self;
-    }
     if (!self.buttonBarView.dataSource){
         self.buttonBarView.dataSource = self;
     }
+    if (!self.buttonBarView.delegate){
+        self.buttonBarView.delegate = self;
+    }
     self.buttonBarView.labelFont = [UIFont boldSystemFontOfSize:18.0f];
     self.buttonBarView.leftRightMargin = 8;
-    self.buttonBarView.scrollsToTop = NO;
-    UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
-    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.buttonBarView.showsHorizontalScrollIndicator = NO;
+    self.buttonBarView.view.scrollsToTop = NO;
+//    UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
+//    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+    self.buttonBarView.view.showsHorizontalScrollIndicator = NO;
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.buttonBarView layoutIfNeeded];
+    //[self.buttonBarView layoutIfNeeded];
     self.isViewAppearing = YES;
 }
 
@@ -187,14 +225,14 @@
     if (url){
         bundle =  [NSBundle bundleWithURL:url];
     }
-    [_buttonBarView registerNib:[UINib nibWithNibName:@"ButtonCell" bundle:bundle] forCellWithReuseIdentifier:@"Cell"];
+    //[_buttonBarView registerNib:[UINib nibWithNibName:@"ButtonCell" bundle:bundle] forCellWithReuseIdentifier:@"Cell"];
     // If a XIB or storyboard hasn't been used then the containView frame that was setup in the
     // XLPagerTabStripViewController won't have accounted for the buttonBarView. So we need to adjust
     // its y position (and also its height) so that childVC's don't appear under the buttonBarView.
-    CGRect newContainerViewFrame = self.containerView.frame;
-    newContainerViewFrame.origin.y = 44.0f;
-    newContainerViewFrame.size.height = self.containerView.frame.size.height - (44.0f - self.containerView.frame.origin.y);
-    self.containerView.frame = newContainerViewFrame;
+//    CGRect newContainerViewFrame = self.containerPagerNode.frame;
+//    newContainerViewFrame.origin.y = 44.0f;
+//    newContainerViewFrame.size.height = self.containerPagerNode.frame.size.height - (44.0f - self.containerPagerNode.frame.origin.y);
+//    self.containerPagerNode.frame = newContainerViewFrame;
     
     return _buttonBarView;
 }
@@ -252,18 +290,39 @@
             // In order to determine what needs to stretch and what doesn't we have to recurse through suggestedStetchedCellWidth
             // values (the value decreases with each recursive call) until we find a value that works.
             // The first value to try is the largest (for the case where all the cell widths are equal)
-            CGFloat stetchedCellWidthIfAllEqual = (collectionViewAvailableVisibleWidth - cellSpacingTotal) / numberOfCells;
+            
+            CGFloat stetchedCellWidthIfAllEqual;
+            BOOL isOddWidth = (int)collectionViewAvailableVisibleWidth % 2;
+            
+            if(isOddWidth) {
+                stetchedCellWidthIfAllEqual = ((collectionViewAvailableVisibleWidth - 3.0f) - cellSpacingTotal) / numberOfCells;
+            } else {
+                stetchedCellWidthIfAllEqual = (collectionViewAvailableVisibleWidth - cellSpacingTotal) / numberOfCells;
+            }
             
             CGFloat generalMiniumCellWidth = [self calculateStretchedCellWidths:minimumCellWidths suggestedStetchedCellWidth:stetchedCellWidthIfAllEqual previousNumberOfLargeCells:0];
             
             NSMutableArray *stetchedCellWidths = [[NSMutableArray alloc] init];
             
+            NSUInteger countCellWidths = minimumCellWidths.count;
+            int countX = 0;
+            
             for (NSNumber *minimumCellWidthValue in minimumCellWidths)
             {
                 CGFloat minimumCellWidth = minimumCellWidthValue.floatValue;
                 CGFloat cellWidth = (minimumCellWidth > generalMiniumCellWidth) ? minimumCellWidth : generalMiniumCellWidth;
+                
+                if(isOddWidth) {
+                    if(countX == 0) {
+                        cellWidth += 1.5f;
+                    } else if(countX == countCellWidths - 1) {
+                        cellWidth += 1.5f;
+                    }
+                }
+                
                 NSNumber *cellWidthValue = [NSNumber numberWithFloat:cellWidth];
                 [stetchedCellWidths addObject:cellWidthValue];
+                countX++;
             }
             
             _cachedCellWidths = stetchedCellWidths;
@@ -347,33 +406,33 @@
     }
 }
 
-#pragma mark - UICollectionViewDelegateFlowLayout
+#pragma mark - ASCollectionNodeDelegateFlowLayout
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (self.cachedCellWidths.count > indexPath.row)
-    {
-        NSNumber *cellWidthValue = self.cachedCellWidths[indexPath.row];
-        CGFloat cellWidth = [cellWidthValue floatValue];
-        return CGSizeMake(cellWidth, collectionView.frame.size.height);
-    }
-    return CGSizeZero;
-}
+//- (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if (self.cachedCellWidths.count > indexPath.row)
+//    {
+//        NSNumber *cellWidthValue = self.cachedCellWidths[indexPath.row];
+//        CGFloat cellWidth = [cellWidthValue floatValue];
+//        return ASSizeRangeMake(CGSizeMake(cellWidth, collectionNode.frame.size.height));
+//    }
+//    return ASSizeRangeZero;
+//}
 
-#pragma mark - UICollectionViewDelegate
+#pragma mark - ASCollectionNodeDelegate
 
-
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)collectionNode:(ASCollectionNode *)collectionNode didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     //There's nothing to do if we select the current selected tab
-	if (indexPath.item == self.currentIndex)
-		return;
-	
+    if (indexPath.item == self.currentIndex)
+        return;
+    
     [self.buttonBarView moveToIndex:indexPath.item animated:YES swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
     self.shouldUpdateButtonBarView = NO;
     
-    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
-    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
+    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+    
     if (self.isProgressiveIndicator) {
         if (self.changeCurrentIndexProgressiveBlock) {
             self.changeCurrentIndexProgressiveBlock(oldCell, newCell, 1, YES, YES);
@@ -388,50 +447,132 @@
     [self moveToViewControllerAtIndex:indexPath.item];
 }
 
-#pragma merk - UICollectionViewDataSource
+//- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    //There's nothing to do if we select the current selected tab
+//    if (indexPath.item == self.currentIndex)
+//        return;
+//    
+//    [self.buttonBarView moveToIndex:indexPath.item animated:YES swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
+//    self.shouldUpdateButtonBarView = NO;
+//    
+//    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
+//    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+//    if (self.isProgressiveIndicator) {
+//        if (self.changeCurrentIndexProgressiveBlock) {
+//            self.changeCurrentIndexProgressiveBlock(oldCell, newCell, 1, YES, YES);
+//        }
+//    }
+//    else{
+//        if (self.changeCurrentIndexBlock) {
+//            self.changeCurrentIndexBlock(oldCell, newCell, YES);
+//        }
+//    }
+//    
+//    [self moveToViewControllerAtIndex:indexPath.item];
+//}
 
--(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+#pragma merk - ASCollectionNodeDataSource
+
+- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section
 {
     return self.pagerTabStripChildViewControllers.count;
 }
 
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    XLButtonBarViewCell * cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
-    NSAssert([cell isKindOfClass:[XLButtonBarViewCell class]], @"UICollectionViewCell should be or extend XLButtonBarViewCell");
-    XLButtonBarViewCell * buttonBarCell = (XLButtonBarViewCell *)cell;
-    UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
-    
-    [buttonBarCell.label setText:[childController titleForPagerTabStripViewController:self]];
-    
-    if (self.buttonBarView.labelFont) {
-        buttonBarCell.label.font = self.buttonBarView.labelFont;
-    }
-    
-    if ([childController respondsToSelector:@selector(imageForPagerTabStripViewController:)]) {
-        UIImage *image = [childController imageForPagerTabStripViewController:self];
-        buttonBarCell.imageView.image = image;
-    }
-    
-    if ([childController respondsToSelector:@selector(highlightedImageForPagerTabStripViewController:)]) {
-        UIImage *image = [childController highlightedImageForPagerTabStripViewController:self];
-        buttonBarCell.imageView.highlightedImage = image;
-    }
-    
-    if (self.isProgressiveIndicator) {
-        if (self.changeCurrentIndexProgressiveBlock) {
-            self.changeCurrentIndexProgressiveBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, 1, YES, NO);
+    return ^{
+        XLButtonBarViewCell *buttonBarCell = [[XLButtonBarViewCell alloc] init];
+        
+        UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
+        
+        // Text Attributes
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = NSTextAlignmentCenter;
+        
+        // Label
+        UIFont *labelFont;
+        if (self.buttonBarView.labelFont) {
+            labelFont = self.buttonBarView.labelFont;
+        } else {
+            labelFont = [UIFont systemFontOfSize:14.0f weight:UIFontWeightMedium];
         }
-    }
-    else{
-        if (self.changeCurrentIndexBlock) {
-            self.changeCurrentIndexBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, NO);
+        
+        NSDictionary *attrsText = @{
+                                    NSFontAttributeName: labelFont,
+                                    NSForegroundColorAttributeName: [UIColor darkTextColor],
+                                    NSParagraphStyleAttributeName : paragraphStyle
+                                    };
+        
+//        ASViewController<XLPagerTabStripChildItem> *childController = self.pagerTabStripChildViewControllers;
+//        
+//        [childController titleForPagerTabStripViewController:childController];
+        
+        buttonBarCell.label.attributedText = [[NSAttributedString alloc] initWithString:[childController titleForPagerTabStripViewController:self]
+                                                                             attributes:attrsText];
+        
+        // Image
+        if ([childController respondsToSelector:@selector(imageForPagerTabStripViewController:)]) {
+            UIImage *image = [childController imageForPagerTabStripViewController:self];
+            buttonBarCell.imageView.image = image;
         }
-    }
-    
-    return buttonBarCell;
+        
+        if ([childController respondsToSelector:@selector(highlightedImageForPagerTabStripViewController:)]) {
+            UIImage *image = [childController highlightedImageForPagerTabStripViewController:self];
+#pragma warning - Deprecate? or Fix?
+        }
+        
+        if (self.isProgressiveIndicator) {
+            if (self.changeCurrentIndexProgressiveBlock) {
+                self.changeCurrentIndexProgressiveBlock(self.currentIndex == indexPath.item ? nil : buttonBarCell , self.currentIndex == indexPath.item ? buttonBarCell : nil, 1, YES, NO);
+            }
+        }
+        else{
+            if (self.changeCurrentIndexBlock) {
+                self.changeCurrentIndexBlock(self.currentIndex == indexPath.item ? nil : buttonBarCell , self.currentIndex == indexPath.item ? buttonBarCell : nil, NO);
+            }
+        }
+        
+        return buttonBarCell;
+    };
 }
+
+//- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    XLButtonBarViewCell * cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
+//    NSAssert([cell isKindOfClass:[XLButtonBarViewCell class]], @"UICollectionViewCell should be or extend XLButtonBarViewCell");
+//    XLButtonBarViewCell * buttonBarCell = (XLButtonBarViewCell *)cell;
+//    UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
+//    
+//    [buttonBarCell.label setText:[childController titleForPagerTabStripViewController:self]];
+//    
+//    if (self.buttonBarView.labelFont) {
+//        buttonBarCell.label.font = self.buttonBarView.labelFont;
+//    }
+//    
+//    if ([childController respondsToSelector:@selector(imageForPagerTabStripViewController:)]) {
+//        UIImage *image = [childController imageForPagerTabStripViewController:self];
+//        buttonBarCell.imageView.image = image;
+//    }
+//    
+//    if ([childController respondsToSelector:@selector(highlightedImageForPagerTabStripViewController:)]) {
+//        UIImage *image = [childController highlightedImageForPagerTabStripViewController:self];
+//        buttonBarCell.imageView.highlightedImage = image;
+//    }
+//    
+//    if (self.isProgressiveIndicator) {
+//        if (self.changeCurrentIndexProgressiveBlock) {
+//            self.changeCurrentIndexProgressiveBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, 1, YES, NO);
+//        }
+//    }
+//    else{
+//        if (self.changeCurrentIndexBlock) {
+//            self.changeCurrentIndexBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, NO);
+//        }
+//    }
+//    
+//    return buttonBarCell;
+//}
 
 
 #pragma mark - UIScrollViewDelegate
@@ -439,7 +580,7 @@
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     [super scrollViewDidEndScrollingAnimation:scrollView];
-    if (scrollView == self.containerView){
+    if (scrollView == self.containerPagerNode.view){
         self.shouldUpdateButtonBarView = YES;
     }
 }

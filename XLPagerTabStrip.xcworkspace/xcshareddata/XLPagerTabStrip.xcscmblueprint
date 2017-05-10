@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "FF277BBF96443A7AD66BBCF80D586F8E3FF7BB4F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F50970FDD9A73637F0802C23B728B6B5862D49A6" : 9223372036854775807,
+    "FF277BBF96443A7AD66BBCF80D586F8E3FF7BB4F" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "D3ED6384-E352-4208-811C-95950D17DB97",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F50970FDD9A73637F0802C23B728B6B5862D49A6" : "Texture\/",
+    "FF277BBF96443A7AD66BBCF80D586F8E3FF7BB4F" : "XLPagerTabStrip\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "XLPagerTabStrip",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "XLPagerTabStrip.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/TextureGroup\/Texture.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F50970FDD9A73637F0802C23B728B6B5862D49A6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/gudjao\/XLPagerTabStrip.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FF277BBF96443A7AD66BBCF80D586F8E3FF7BB4F"
+    }
+  ]
+}
