@@ -28,7 +28,7 @@
 
 @interface XLButtonBarView ()
 
-@property UIView * selectedBar;
+@property ASDisplayNode * selectedBar;
 @property NSUInteger selectedOptionIndex;
 
 @end
@@ -38,20 +38,109 @@
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout {
     self = [super initWithFrame:frame collectionViewLayout:layout];
     if(self) {
-        [self initializeXLButtonBarView];
+        //self.automaticallyManagesSubnodes = YES;
         
-        self.automaticallyManagesSubnodes = YES;
+//        self.testNode = [[ASDisplayNode alloc] init];
+//        self.testNode.backgroundColor = [UIColor greenColor];
+//        self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
+//        self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
+//        self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
+//        
+//        //[self.view addSubnode:self.testNode];
+//        
+//        [self.view addSubview:self.testNode.view];
+        
+        _selectedOptionIndex = 0;
+        _selectedBarHeight = 5;
+        
+        //    if ([self.selectedBar supernode] == nil){
+        //        [self addSubnode:self.selectedBar];
+        //    }
+        
+        _selectedBar = [[ASDisplayNode alloc] init];
+        //_selectedBar.layer.zPosition = 9999;
+        _selectedBar.backgroundColor = [UIColor blackColor];
+        
+        //[self addSubnode:_selectedBar];
+        
+//        __weak typeof(self) weakSelf = self;
+//        
+//        self.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+//            weakSelf.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
+//            
+//            return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
+//                                                                         verticalPosition:ASRelativeLayoutSpecPositionEnd
+//                                                                             sizingOption:ASRelativeLayoutSpecSizingOptionDefault
+//                                                                                    child:weakSelf.selectedBar];
+//        };
+        
+        //[self initializeXLButtonBarView];
     }
     return self;
 }
+
+- (void)didLoad {
+    [super didLoad];
+    
+    self.testNode = [[ASDisplayNode alloc] init];
+    self.testNode.backgroundColor = [UIColor greenColor];
+    self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
+    self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
+    self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
+    
+    //[self.view addSubnode:self.testNode];
+    
+    [self.view addSubview:self.testNode.view];
+    
+    UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100.0f, 5.0f)];
+    testView.backgroundColor = [UIColor yellowColor];
+    
+    //[self.view addSubview:testView];
+}
+
+//- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+//    self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
+//    self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
+//    self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
+//    
+//    return [ASWrapperLayoutSpec wrapperWithLayoutElement:self.testNode];
+//    
+//    //self.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
+//    self.selectedBar.style.height = ASDimensionMakeWithPoints(10.0f);
+//    self.selectedBar.style.width = ASDimensionMakeWithPoints(100.0f);
+//    self.selectedBar.style.layoutPosition = CGPointMake(10.0f, 10.0f);
+//    
+//    return [ASWrapperLayoutSpec wrapperWithLayoutElement:self.selectedBar];
+//    
+//    return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
+//                                                                 verticalPosition:ASRelativeLayoutSpecPositionEnd
+//                                                                     sizingOption:ASRelativeLayoutSpecSizingOptionDefault
+//                                                                            child:self.selectedBar];
+//}
 
 -(void)initializeXLButtonBarView
 {
     _selectedOptionIndex = 0;
     _selectedBarHeight = 5;
-    if ([self.selectedBar superview] == nil){
-        [self.view addSubview:self.selectedBar];
-    }
+    
+//    if ([self.selectedBar supernode] == nil){
+//        [self addSubnode:self.selectedBar];
+//    }
+    
+    _selectedBar = [[ASDisplayNode alloc] init];
+    _selectedBar.layer.zPosition = 9999;
+    _selectedBar.backgroundColor = [UIColor blackColor];
+    
+    __weak typeof(self) weakSelf = self;
+    
+    self.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+        weakSelf.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
+        
+        return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
+                                                                     verticalPosition:ASRelativeLayoutSpecPositionEnd
+                                                                         sizingOption:ASRelativeLayoutSpecSizingOptionDefault
+                                                                                child:weakSelf.selectedBar];
+    };
 }
 
 //- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
@@ -68,7 +157,7 @@
 -(void)moveToIndex:(NSUInteger)index animated:(BOOL)animated swipeDirection:(XLPagerTabStripDirection)swipeDirection pagerScroll:(XLPagerScroll)pagerScroll
 {
     self.selectedOptionIndex = index;
-    [self updateSelectedBarPositionWithAnimation:animated swipeDirection:swipeDirection pagerScroll:pagerScroll];
+    //[self updateSelectedBarPositionWithAnimation:animated swipeDirection:swipeDirection pagerScroll:pagerScroll];
 }
 
 -(void)moveFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex withProgressPercentage:(CGFloat)progressPercentage pagerScroll:(XLPagerScroll)pagerScroll
@@ -227,14 +316,15 @@
     _selectedBar.frame = CGRectMake(_selectedBar.frame.origin.x, self.frame.size.height - _selectedBarHeight, _selectedBar.frame.size.width, _selectedBarHeight);
 }
 
-- (UIView *)selectedBar
-{
-    if (!_selectedBar) {
-        _selectedBar = [[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height - _selectedBarHeight, 0, _selectedBarHeight)];
-        _selectedBar.layer.zPosition = 9999;
-        _selectedBar.backgroundColor = [UIColor blackColor];
-    }
-    return _selectedBar;
-}
+//- (ASDisplayNode *)selectedBar
+//{
+//    if (!_selectedBar) {
+//        //_selectedBar = [[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height - _selectedBarHeight, 0, _selectedBarHeight)];
+//        _selectedBar = [[ASDisplayNode alloc] init];
+//        _selectedBar.layer.zPosition = 9999;
+//        _selectedBar.backgroundColor = [UIColor blackColor];
+//    }
+//    return _selectedBar;
+//}
 
 @end

@@ -136,34 +136,34 @@
     self.isViewAppearing = NO;
 }
 
-- (void)viewWillLayoutSubviews
-{
-    [super viewWillLayoutSubviews];
-    
-    if (self.isViewAppearing || self.isViewRotating) {
-        // Force the UICollectionViewFlowLayout to get laid out again with the new size if
-        // a) The view is appearing.  This ensures that
-        //    collectionView:layout:sizeForItemAtIndexPath: is called for a second time
-        //    when the view is shown and when the view *frame(s)* are actually set
-        //    (we need the view frame's to have been set to work out the size's and on the
-        //    first call to collectionView:layout:sizeForItemAtIndexPath: the view frame(s)
-        //    aren't set correctly)
-        // b) The view is rotating.  This ensures that
-        //    collectionView:layout:sizeForItemAtIndexPath: is called again and can use the views
-        //    *new* frame so that the buttonBarView cell's actually get resized correctly
-        self.cachedCellWidths = nil; // Clear/invalidate our cache of cell widths
-        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
-        [flowLayout invalidateLayout];
-        
-        // Ensure the buttonBarView.frame is sized correctly after rotation on iOS 7 devices
-        [self.buttonBarView layoutIfNeeded];
-        
-        // When the view first appears or is rotated we also need to ensure that the barButtonView's
-        // selectedBar is resized and its contentOffset/scroll is set correctly (the selected
-        // tab/cell may end up either skewed or off screen after a rotation otherwise)
-        [self.buttonBarView moveToIndex:self.currentIndex animated:NO swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollOnlyIfOutOfScreen];
-    }
-}
+//- (void)viewWillLayoutSubviews
+//{
+//    [super viewWillLayoutSubviews];
+//    
+//    if (self.isViewAppearing || self.isViewRotating) {
+//        // Force the UICollectionViewFlowLayout to get laid out again with the new size if
+//        // a) The view is appearing.  This ensures that
+//        //    collectionView:layout:sizeForItemAtIndexPath: is called for a second time
+//        //    when the view is shown and when the view *frame(s)* are actually set
+//        //    (we need the view frame's to have been set to work out the size's and on the
+//        //    first call to collectionView:layout:sizeForItemAtIndexPath: the view frame(s)
+//        //    aren't set correctly)
+//        // b) The view is rotating.  This ensures that
+//        //    collectionView:layout:sizeForItemAtIndexPath: is called again and can use the views
+//        //    *new* frame so that the buttonBarView cell's actually get resized correctly
+//        self.cachedCellWidths = nil; // Clear/invalidate our cache of cell widths
+//        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
+//        [flowLayout invalidateLayout];
+//        
+//        // Ensure the buttonBarView.frame is sized correctly after rotation on iOS 7 devices
+//        [self.buttonBarView layoutIfNeeded];
+//        
+//        // When the view first appears or is rotated we also need to ensure that the barButtonView's
+//        // selectedBar is resized and its contentOffset/scroll is set correctly (the selected
+//        // tab/cell may end up either skewed or off screen after a rotation otherwise)
+//        [self.buttonBarView moveToIndex:self.currentIndex animated:NO swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollOnlyIfOutOfScreen];
+//    }
+//}
 
 
 #pragma mark - View Rotation
@@ -203,39 +203,39 @@
 
 #pragma mark - Properties
 
--(XLButtonBarView *)buttonBarView
-{
-    if (_buttonBarView) return _buttonBarView;
-    
-    // If _buttonBarView is nil then it wasn't configured in a XIB or storyboard so
-    // this class is being used programmatically. We need to initialise the buttonBarView,
-    // setup some sensible defaults (which can of course always be re-set in the sub-class),
-    // and set an appropriate frame. The buttonBarView gets added to to the view in viewDidLoad:
-    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    flowLayout.sectionInset = UIEdgeInsetsMake(0, 35, 0, 35);
-    _buttonBarView = [[XLButtonBarView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44.0f) collectionViewLayout:flowLayout];
-    _buttonBarView.backgroundColor = [UIColor orangeColor];
-    _buttonBarView.selectedBar.backgroundColor = [UIColor blackColor];
-    _buttonBarView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    // If a XIB or storyboard hasn't been used we also need to register the cell reuseIdentifier
-    // as well otherwise we'll get a crash when the code attempts to dequeue any cell's
-    NSBundle * bundle = [NSBundle bundleForClass:[XLButtonBarView class]];
-    NSURL * url = [bundle URLForResource:@"XLPagerTabStrip" withExtension:@"bundle"];
-    if (url){
-        bundle =  [NSBundle bundleWithURL:url];
-    }
-    //[_buttonBarView registerNib:[UINib nibWithNibName:@"ButtonCell" bundle:bundle] forCellWithReuseIdentifier:@"Cell"];
-    // If a XIB or storyboard hasn't been used then the containView frame that was setup in the
-    // XLPagerTabStripViewController won't have accounted for the buttonBarView. So we need to adjust
-    // its y position (and also its height) so that childVC's don't appear under the buttonBarView.
-//    CGRect newContainerViewFrame = self.containerPagerNode.frame;
-//    newContainerViewFrame.origin.y = 44.0f;
-//    newContainerViewFrame.size.height = self.containerPagerNode.frame.size.height - (44.0f - self.containerPagerNode.frame.origin.y);
-//    self.containerPagerNode.frame = newContainerViewFrame;
-    
-    return _buttonBarView;
-}
+//-(XLButtonBarView *)buttonBarView
+//{
+//    if (_buttonBarView) return _buttonBarView;
+//    
+//    // If _buttonBarView is nil then it wasn't configured in a XIB or storyboard so
+//    // this class is being used programmatically. We need to initialise the buttonBarView,
+//    // setup some sensible defaults (which can of course always be re-set in the sub-class),
+//    // and set an appropriate frame. The buttonBarView gets added to to the view in viewDidLoad:
+//    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+//    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+//    flowLayout.sectionInset = UIEdgeInsetsMake(0, 35, 0, 35);
+//    _buttonBarView = [[XLButtonBarView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44.0f) collectionViewLayout:flowLayout];
+//    _buttonBarView.backgroundColor = [UIColor orangeColor];
+//    _buttonBarView.selectedBar.backgroundColor = [UIColor blackColor];
+//    _buttonBarView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//    // If a XIB or storyboard hasn't been used we also need to register the cell reuseIdentifier
+//    // as well otherwise we'll get a crash when the code attempts to dequeue any cell's
+//    NSBundle * bundle = [NSBundle bundleForClass:[XLButtonBarView class]];
+//    NSURL * url = [bundle URLForResource:@"XLPagerTabStrip" withExtension:@"bundle"];
+//    if (url){
+//        bundle =  [NSBundle bundleWithURL:url];
+//    }
+//    //[_buttonBarView registerNib:[UINib nibWithNibName:@"ButtonCell" bundle:bundle] forCellWithReuseIdentifier:@"Cell"];
+//    // If a XIB or storyboard hasn't been used then the containView frame that was setup in the
+//    // XLPagerTabStripViewController won't have accounted for the buttonBarView. So we need to adjust
+//    // its y position (and also its height) so that childVC's don't appear under the buttonBarView.
+////    CGRect newContainerViewFrame = self.containerPagerNode.frame;
+////    newContainerViewFrame.origin.y = 44.0f;
+////    newContainerViewFrame.size.height = self.containerPagerNode.frame.size.height - (44.0f - self.containerPagerNode.frame.origin.y);
+////    self.containerPagerNode.frame = newContainerViewFrame;
+//    
+//    return _buttonBarView;
+//}
 
 - (NSArray *)cachedCellWidths
 {
@@ -447,31 +447,6 @@
     [self moveToViewControllerAtIndex:indexPath.item];
 }
 
-//- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    //There's nothing to do if we select the current selected tab
-//    if (indexPath.item == self.currentIndex)
-//        return;
-//    
-//    [self.buttonBarView moveToIndex:indexPath.item animated:YES swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
-//    self.shouldUpdateButtonBarView = NO;
-//    
-//    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
-//    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
-//    if (self.isProgressiveIndicator) {
-//        if (self.changeCurrentIndexProgressiveBlock) {
-//            self.changeCurrentIndexProgressiveBlock(oldCell, newCell, 1, YES, YES);
-//        }
-//    }
-//    else{
-//        if (self.changeCurrentIndexBlock) {
-//            self.changeCurrentIndexBlock(oldCell, newCell, YES);
-//        }
-//    }
-//    
-//    [self moveToViewControllerAtIndex:indexPath.item];
-//}
-
 #pragma merk - ASCollectionNodeDataSource
 
 - (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section
@@ -481,10 +456,10 @@
 
 - (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
+    
     return ^{
         XLButtonBarViewCell *buttonBarCell = [[XLButtonBarViewCell alloc] init];
-        
-        UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
         
         // Text Attributes
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
@@ -500,13 +475,9 @@
         
         NSDictionary *attrsText = @{
                                     NSFontAttributeName: labelFont,
-                                    NSForegroundColorAttributeName: [UIColor darkTextColor],
+                                    NSForegroundColorAttributeName: [childController colorForPagerTabStripViewController:self],
                                     NSParagraphStyleAttributeName : paragraphStyle
                                     };
-        
-//        ASViewController<XLPagerTabStripChildItem> *childController = self.pagerTabStripChildViewControllers;
-//        
-//        [childController titleForPagerTabStripViewController:childController];
         
         buttonBarCell.label.attributedText = [[NSAttributedString alloc] initWithString:[childController titleForPagerTabStripViewController:self]
                                                                              attributes:attrsText];
@@ -536,44 +507,6 @@
         return buttonBarCell;
     };
 }
-
-//- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    XLButtonBarViewCell * cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
-//    NSAssert([cell isKindOfClass:[XLButtonBarViewCell class]], @"UICollectionViewCell should be or extend XLButtonBarViewCell");
-//    XLButtonBarViewCell * buttonBarCell = (XLButtonBarViewCell *)cell;
-//    UIViewController<XLPagerTabStripChildItem> * childController =   [self.pagerTabStripChildViewControllers objectAtIndex:indexPath.item];
-//    
-//    [buttonBarCell.label setText:[childController titleForPagerTabStripViewController:self]];
-//    
-//    if (self.buttonBarView.labelFont) {
-//        buttonBarCell.label.font = self.buttonBarView.labelFont;
-//    }
-//    
-//    if ([childController respondsToSelector:@selector(imageForPagerTabStripViewController:)]) {
-//        UIImage *image = [childController imageForPagerTabStripViewController:self];
-//        buttonBarCell.imageView.image = image;
-//    }
-//    
-//    if ([childController respondsToSelector:@selector(highlightedImageForPagerTabStripViewController:)]) {
-//        UIImage *image = [childController highlightedImageForPagerTabStripViewController:self];
-//        buttonBarCell.imageView.highlightedImage = image;
-//    }
-//    
-//    if (self.isProgressiveIndicator) {
-//        if (self.changeCurrentIndexProgressiveBlock) {
-//            self.changeCurrentIndexProgressiveBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, 1, YES, NO);
-//        }
-//    }
-//    else{
-//        if (self.changeCurrentIndexBlock) {
-//            self.changeCurrentIndexBlock(self.currentIndex == indexPath.item ? nil : cell , self.currentIndex == indexPath.item ? cell : nil, NO);
-//        }
-//    }
-//    
-//    return buttonBarCell;
-//}
-
 
 #pragma mark - UIScrollViewDelegate
 

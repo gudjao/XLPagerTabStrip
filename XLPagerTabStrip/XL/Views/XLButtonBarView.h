@@ -42,8 +42,9 @@ typedef NS_ENUM(NSUInteger, XLSelectedBarAlignment) {
 
 @interface XLButtonBarView : ASCollectionNode
 
-@property (readonly, nonatomic) UIView * selectedBar;
+@property (readonly, nonatomic) ASDisplayNode * selectedBar;
 @property (nonatomic) CGFloat selectedBarHeight;
+@property (strong, nonatomic) ASDisplayNode * testNode;
 @property (nonatomic) XLSelectedBarAlignment selectedBarAlignment;
 @property (nonatomic) BOOL shouldCellsFillAvailableWidth;
 @property UIFont * labelFont;
