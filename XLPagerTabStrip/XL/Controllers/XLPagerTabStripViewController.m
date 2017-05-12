@@ -114,7 +114,7 @@
 
 - (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node {
     //self.currentIndex = [collectionNode indexPathForNode:node].item;
-    NSLog(@"Curren Index: %lu", (unsigned long)self.currentIndex);
+    //NSLog(@"Current Index: %lu", (unsigned long)self.currentIndex);
 }
 
 #pragma mark - ASPager code end -

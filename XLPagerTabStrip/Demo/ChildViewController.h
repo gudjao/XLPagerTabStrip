@@ -14,4 +14,6 @@
 
 @interface ChildViewController : ASViewController <XLPagerTabStripChildItem>
 
+@property (strong, nonatomic) ASTextNode *labelTextNode;
+
 @end

@@ -64,21 +64,17 @@
     if (self) {
         self.shouldUpdateButtonBarView = YES;
         
-        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        flowLayout.sectionInset = UIEdgeInsetsMake(0, 35, 0, 35);
-        _buttonBarView = [[XLButtonBarView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44.0f) collectionViewLayout:flowLayout];
-        _buttonBarView.backgroundColor = [UIColor orangeColor];
-        _buttonBarView.selectedBar.backgroundColor = [UIColor blackColor];
-        _buttonBarView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        _buttonBarView.delegate = self;
-        _buttonBarView.dataSource = self;
+        _buttonBarView = [[XLButtonBarView alloc] init];
+        _buttonBarView.collectionNode.backgroundColor = [UIColor orangeColor];
+        _buttonBarView.selectedBar.backgroundColor = [UIColor yellowColor];
+        _buttonBarView.collectionNode.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _buttonBarView.collectionNode.delegate = self;
+        _buttonBarView.collectionNode.dataSource = self;
         
         __weak typeof(self) weakSelf = self;
         
         self.node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-            NSLog(@"%f - %f", constrainedSize.max.width, constrainedSize.max.height);
-            
+    
             weakSelf.buttonBarView.style.preferredSize = CGSizeMake(constrainedSize.max.width, 44.0f);
             weakSelf.containerPagerNode.style.preferredSize = constrainedSize.max;
             weakSelf.containerPagerNode.style.flexShrink = 1.0f;
@@ -103,24 +99,16 @@
 {
     [super viewDidLoad];
     
-    if (!self.buttonBarView.view.superview){
-        // If buttonBarView wasn't configured in a XIB or storyboard then it won't have
-        // been added to the view so we need to do it programmatically.
-        //[self.view addSubview:self.buttonBarView.view];
-    }
-    
-    if (!self.buttonBarView.dataSource){
-        self.buttonBarView.dataSource = self;
-    }
-    if (!self.buttonBarView.delegate){
-        self.buttonBarView.delegate = self;
-    }
     self.buttonBarView.labelFont = [UIFont boldSystemFontOfSize:18.0f];
     self.buttonBarView.leftRightMargin = 8;
-    self.buttonBarView.view.scrollsToTop = NO;
-//    UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
-//    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.buttonBarView.view.showsHorizontalScrollIndicator = NO;
+    self.buttonBarView.collectionNode.view.scrollsToTop = NO;
+    self.buttonBarView.collectionNode.view.showsHorizontalScrollIndicator = NO;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    [self.buttonBarView moveToIndex:self.currentIndex animated:NO swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollOnlyIfOutOfScreen];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -152,7 +140,7 @@
 //        //    collectionView:layout:sizeForItemAtIndexPath: is called again and can use the views
 //        //    *new* frame so that the buttonBarView cell's actually get resized correctly
 //        self.cachedCellWidths = nil; // Clear/invalidate our cache of cell widths
-//        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
+//        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionNode.collectionViewLayout;
 //        [flowLayout invalidateLayout];
 //        
 //        // Ensure the buttonBarView.frame is sized correctly after rotation on iOS 7 devices
@@ -195,7 +183,7 @@
     
     [super reloadPagerTabStripView];
     if ([self isViewLoaded]){
-        [self.buttonBarView reloadData];
+        [self.buttonBarView.collectionNode reloadData];
         [self.buttonBarView moveToIndex:self.currentIndex animated:NO swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
     }
 }
@@ -243,7 +231,7 @@
     {
         // First calculate the minimum width required by each cell
         
-        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
+        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionNode.collectionViewLayout;
         NSUInteger numberOfCells = self.pagerTabStripChildViewControllers.count;
         
         NSMutableArray *minimumCellWidths = [[NSMutableArray alloc] init];
@@ -351,7 +339,7 @@
     if (numberOfLargeCells > previousNumberOfLargeCells)
     {
         // The suggestedStetchedCellWidth is no good :-( ... calculate a new suggested width
-        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionViewLayout;
+        UICollectionViewFlowLayout *flowLayout = (id)self.buttonBarView.collectionNode.collectionViewLayout;
         CGFloat collectionViewAvailableVisibleWidth = self.buttonBarView.frame.size.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right;
         NSUInteger numberOfCells = minimumCellWidths.count;
         CGFloat cellSpacingTotal = ((numberOfCells-1) * flowLayout.minimumInteritemSpacing);
@@ -380,8 +368,8 @@
         }
         [self.buttonBarView moveToIndex:toIndex animated:YES swipeDirection:direction pagerScroll:XLPagerScrollYES];
         if (self.changeCurrentIndexBlock) {
-            XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex != fromIndex ? fromIndex : toIndex inSection:0]];
-            XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
+            XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex != fromIndex ? fromIndex : toIndex inSection:0]];
+            XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
             self.changeCurrentIndexBlock(oldCell, newCell, YES);
         }
     }
@@ -399,8 +387,8 @@
                    withProgressPercentage:progressPercentage pagerScroll:XLPagerScrollYES];
         
         if (self.changeCurrentIndexProgressiveBlock) {
-            XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex != fromIndex ? fromIndex : toIndex inSection:0]];
-            XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
+            XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex != fromIndex ? fromIndex : toIndex inSection:0]];
+            XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
             self.changeCurrentIndexProgressiveBlock(oldCell, newCell, progressPercentage, indexWasChanged, YES);
         }
     }
@@ -430,8 +418,8 @@
     [self.buttonBarView moveToIndex:indexPath.item animated:YES swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
     self.shouldUpdateButtonBarView = NO;
     
-    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
-    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+    XLButtonBarViewCell *oldCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0]];
+    XLButtonBarViewCell *newCell = (XLButtonBarViewCell*)[self.buttonBarView.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
     
     if (self.isProgressiveIndicator) {
         if (self.changeCurrentIndexProgressiveBlock) {
@@ -460,6 +448,7 @@
     
     return ^{
         XLButtonBarViewCell *buttonBarCell = [[XLButtonBarViewCell alloc] init];
+        buttonBarCell.backgroundColor = [UIColor greenColor];
         
         // Text Attributes
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];

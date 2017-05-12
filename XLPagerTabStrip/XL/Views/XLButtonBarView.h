@@ -40,11 +40,11 @@ typedef NS_ENUM(NSUInteger, XLSelectedBarAlignment) {
     XLSelectedBarAlignmentProgressive
 };
 
-@interface XLButtonBarView : ASCollectionNode
+@interface XLButtonBarView : ASDisplayNode <ASCollectionDelegate>
 
+@property (strong, nonatomic) ASCollectionNode *collectionNode;
 @property (readonly, nonatomic) ASDisplayNode * selectedBar;
 @property (nonatomic) CGFloat selectedBarHeight;
-@property (strong, nonatomic) ASDisplayNode * testNode;
 @property (nonatomic) XLSelectedBarAlignment selectedBarAlignment;
 @property (nonatomic) BOOL shouldCellsFillAvailableWidth;
 @property UIFont * labelFont;
@@ -53,7 +53,5 @@ typedef NS_ENUM(NSUInteger, XLSelectedBarAlignment) {
 -(void)moveToIndex:(NSUInteger)index animated:(BOOL)animated swipeDirection:(XLPagerTabStripDirection)swipeDirection pagerScroll:(XLPagerScroll)pagerScroll;
 
 -(void)moveFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex withProgressPercentage:(CGFloat)progressPercentage pagerScroll:(XLPagerScroll)pagerScroll;
-
-
 
 @end

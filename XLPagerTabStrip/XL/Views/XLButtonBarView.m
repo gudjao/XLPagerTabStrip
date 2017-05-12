@@ -26,6 +26,8 @@
 
 #import "XLButtonBarView.h"
 
+#import "XLButtonBarViewCell.h"
+
 @interface XLButtonBarView ()
 
 @property ASDisplayNode * selectedBar;
@@ -35,129 +37,69 @@
 
 @implementation XLButtonBarView
 
-- (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout {
-    self = [super initWithFrame:frame collectionViewLayout:layout];
+- (instancetype)init {
+    self = [super init];
     if(self) {
-        //self.automaticallyManagesSubnodes = YES;
-        
-//        self.testNode = [[ASDisplayNode alloc] init];
-//        self.testNode.backgroundColor = [UIColor greenColor];
-//        self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
-//        self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
-//        self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
-//        
-//        //[self.view addSubnode:self.testNode];
-//        
-//        [self.view addSubview:self.testNode.view];
+        self.automaticallyManagesSubnodes = YES;
         
         _selectedOptionIndex = 0;
         _selectedBarHeight = 5;
         
-        //    if ([self.selectedBar supernode] == nil){
-        //        [self addSubnode:self.selectedBar];
-        //    }
+        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+        flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 35, 0, 35);
+        self.collectionNode = [[ASCollectionNode alloc] initWithCollectionViewLayout:flowLayout];
         
-        _selectedBar = [[ASDisplayNode alloc] init];
-        //_selectedBar.layer.zPosition = 9999;
-        _selectedBar.backgroundColor = [UIColor blackColor];
-        
-        //[self addSubnode:_selectedBar];
-        
-//        __weak typeof(self) weakSelf = self;
-//        
-//        self.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-//            weakSelf.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
-//            
-//            return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
-//                                                                         verticalPosition:ASRelativeLayoutSpecPositionEnd
-//                                                                             sizingOption:ASRelativeLayoutSpecSizingOptionDefault
-//                                                                                    child:weakSelf.selectedBar];
-//        };
-        
-        //[self initializeXLButtonBarView];
+        self.selectedBar = [[ASDisplayNode alloc] init];
+        self.selectedBar.layer.zPosition = 9999;
+        self.selectedBar.backgroundColor = [UIColor yellowColor];
+        self.selectedBar.frame = CGRectMake(35, 44.0f - _selectedBarHeight, 0, _selectedBarHeight);
+        //CGRectMake(0, self.frame.size.height - _selectedBarHeight, 0, _selectedBarHeight)];
     }
     return self;
 }
 
-- (void)didLoad {
-    [super didLoad];
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+    self.collectionNode.style.preferredSize = constrainedSize.max;
     
-    self.testNode = [[ASDisplayNode alloc] init];
-    self.testNode.backgroundColor = [UIColor greenColor];
-    self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
-    self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
-    self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
+    CGPoint point = self.selectedBar.frame.origin;
+    //point.y = constrainedSize.max.height - _selectedBarHeight;
+    CGSize size = self.selectedBar.frame.size;
     
-    //[self.view addSubnode:self.testNode];
+    self.selectedBar.style.layoutPosition = point;
+    self.selectedBar.style.preferredSize = size;
     
-    [self.view addSubview:self.testNode.view];
-    
-    UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100.0f, 5.0f)];
-    testView.backgroundColor = [UIColor yellowColor];
-    
-    //[self.view addSubview:testView];
+    return [ASBackgroundLayoutSpec backgroundLayoutSpecWithChild:[ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[self.selectedBar]]
+                                                      background:self.collectionNode];
 }
 
-//- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
-//    self.testNode.style.height = ASDimensionMakeWithPoints(10.0f);
-//    self.testNode.style.width = ASDimensionMakeWithPoints(100.0f);
-//    self.testNode.style.layoutPosition = CGPointMake(10.0f, 10.0f);
-//    
-//    return [ASWrapperLayoutSpec wrapperWithLayoutElement:self.testNode];
-//    
-//    //self.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
-//    self.selectedBar.style.height = ASDimensionMakeWithPoints(10.0f);
-//    self.selectedBar.style.width = ASDimensionMakeWithPoints(100.0f);
-//    self.selectedBar.style.layoutPosition = CGPointMake(10.0f, 10.0f);
-//    
-//    return [ASWrapperLayoutSpec wrapperWithLayoutElement:self.selectedBar];
-//    
-//    return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
-//                                                                 verticalPosition:ASRelativeLayoutSpecPositionEnd
-//                                                                     sizingOption:ASRelativeLayoutSpecSizingOptionDefault
-//                                                                            child:self.selectedBar];
-//}
-
--(void)initializeXLButtonBarView
-{
-    _selectedOptionIndex = 0;
-    _selectedBarHeight = 5;
-    
-//    if ([self.selectedBar supernode] == nil){
-//        [self addSubnode:self.selectedBar];
-//    }
-    
-    _selectedBar = [[ASDisplayNode alloc] init];
-    _selectedBar.layer.zPosition = 9999;
-    _selectedBar.backgroundColor = [UIColor blackColor];
-    
-    __weak typeof(self) weakSelf = self;
-    
-    self.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-        weakSelf.selectedBar.style.preferredSize = CGSizeMake(100.0f, 10.0f);
-        
-        return [ASRelativeLayoutSpec relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
-                                                                     verticalPosition:ASRelativeLayoutSpecPositionEnd
-                                                                         sizingOption:ASRelativeLayoutSpecSizingOptionDefault
-                                                                                child:weakSelf.selectedBar];
-    };
+- (void)animateLayoutTransition:(id<ASContextTransitioning>)context {
+    CGRect initialNameFrame = [context initialFrameForNode:self.selectedBar];
+    self.selectedBar.frame = initialNameFrame;
+    [UIView animateWithDuration:0.4 animations:^{
+        self.selectedBar.frame = [context finalFrameForNode:self.selectedBar];
+    } completion:^(BOOL finished) {
+        [context completeTransition:finished];
+    }];
 }
-
-//- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
-//    _selectedBar.style.height = ASDimensionMakeWithPoints(_selectedBarHeight);
-//    
-//    ASRelativeLayoutSpec *relativeSelectedBar = [ASRelativeLayoutSpec
-//                                                 relativePositionLayoutSpecWithHorizontalPosition:ASRelativeLayoutSpecPositionCenter
-//                                                 verticalPosition:ASRelativeLayoutSpecPositionEnd
-//                                                 sizingOption:ASRelativeLayoutSpecSizingOptionDefault
-//                                                 child:_selectedBar];
-//    return relativeSelectedBar;
-//}
 
 -(void)moveToIndex:(NSUInteger)index animated:(BOOL)animated swipeDirection:(XLPagerTabStripDirection)swipeDirection pagerScroll:(XLPagerScroll)pagerScroll
 {
     self.selectedOptionIndex = index;
-    //[self updateSelectedBarPositionWithAnimation:animated swipeDirection:swipeDirection pagerScroll:pagerScroll];
+    
+    XLButtonBarViewCell *cell = [self.collectionNode nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:index
+                                                                                                inSection:0]];
+    
+    // Check if cell node is loaded
+    if(cell.isNodeLoaded) {
+        //CGRect originRect = [self.collectionNode convertRect:CGRectZero fromNode:cell];
+        
+        [self updateSelectedBarPositionWithAnimation:animated swipeDirection:swipeDirection pagerScroll:pagerScroll];
+    } else {
+        [cell onDidLoad:^(__kindof ASDisplayNode * _Nonnull node) {
+            [self updateSelectedBarPositionWithAnimation:animated swipeDirection:swipeDirection pagerScroll:pagerScroll];
+        }];
+    }
 }
 
 -(void)moveFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex withProgressPercentage:(CGFloat)progressPercentage pagerScroll:(XLPagerScroll)pagerScroll
@@ -166,22 +108,21 @@
     
     self.selectedOptionIndex = (progressPercentage > 0.5 ) ? toIndex : fromIndex;
     
-    CGRect fromFrame =[self.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:fromIndex inSection:0]].frame;
-    NSInteger numberOfItems = [self.dataSource collectionNode:self numberOfItemsInSection:0];
-    
+    CGRect fromFrame =[self.collectionNode.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:fromIndex inSection:0]].frame;
+    NSInteger numberOfItems = [self.collectionNode.dataSource collectionNode:self.collectionNode numberOfItemsInSection:0];
     CGRect toFrame;
     if (toIndex < 0 || toIndex > numberOfItems - 1){
         if (toIndex < 0) {
-            UICollectionViewLayoutAttributes * cellAtts = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+            UICollectionViewLayoutAttributes * cellAtts = [self.collectionNode.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
             toFrame = CGRectOffset(cellAtts.frame, -cellAtts.frame.size.width, 0);
         }
         else{
-            UICollectionViewLayoutAttributes * cellAtts = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:(numberOfItems - 1) inSection:0]];
+            UICollectionViewLayoutAttributes * cellAtts = [self.collectionNode.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:(numberOfItems - 1) inSection:0]];
             toFrame = CGRectOffset(cellAtts.frame, cellAtts.frame.size.width, 0);
         }
     }
     else{
-        toFrame = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:toIndex inSection:0]].frame;
+        toFrame = [self.collectionNode.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:toIndex inSection:0]].frame;
     }
     CGRect targetFrame = fromFrame;
     targetFrame.size.height = self.selectedBar.frame.size.height;
@@ -195,7 +136,7 @@
     
     float targetContentOffset = 0;
     // Only bother calculating the contentOffset if there are sufficient tabs that the bar can actually scroll!
-    if (self.view.contentSize.width > self.frame.size.width)
+    if (self.collectionNode.view.contentSize.width > self.collectionNode.frame.size.width)
     {
         CGFloat toContentOffset = [self contentOffsetForCellWithFrame:toFrame index:toIndex];
         CGFloat fromContentOffset = [self contentOffsetForCellWithFrame:fromFrame index:fromIndex];
@@ -208,32 +149,47 @@
     // scrolled the XLButtonBarView and then subsequently scrolled the UIPageViewController)
     // Alternatively if the fromIndex and toIndex are the same then this is the last call to this method in the
     // progression so as a precaution always animate this contentOffest change
-    BOOL animated = (ABS(self.view.contentOffset.x - targetContentOffset) > 30) || (fromIndex == toIndex);
-    [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
+    BOOL animated = (ABS(self.collectionNode.view.contentOffset.x - targetContentOffset) > 30) || (fromIndex == toIndex);
+    [self.collectionNode.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
 }
-
 
 -(void)updateSelectedBarPositionWithAnimation:(BOOL)animation swipeDirection:(XLPagerTabStripDirection __unused)swipeDirection pagerScroll:(XLPagerScroll)pagerScroll
 {
     CGRect selectedBarFrame = self.selectedBar.frame;
     
     NSIndexPath *selectedCellIndexPath = [NSIndexPath indexPathForItem:self.selectedOptionIndex inSection:0];
-    UICollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:selectedCellIndexPath];
+    UICollectionViewLayoutAttributes *attributes = [self.collectionNode.collectionViewLayout layoutAttributesForItemAtIndexPath:selectedCellIndexPath];
     CGRect selectedCellFrame = attributes.frame;
+    
+    //CGRect cellFrameInSuperview = [collectionView convertRect:theAttributes.frame toView:[collectionView superview]];
+    
+    //CGRect cellFrameInSuperview = [self.collectionNode convertRect:attributes.frame toNode:self.collectionNode.supernode];
+    //CGRect frameTest = [self.collectionNode convertRect:attributes.frame toNode:self];
+    CGRect frameTest = [self.collectionNode convertRect:attributes.frame toNode:nil];
+    
+    //selectedCellFrame = frameTest;
     
     [self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
     
     selectedBarFrame.size.width = selectedCellFrame.size.width;
     selectedBarFrame.origin.x = selectedCellFrame.origin.x;
+    //selectedBarFrame.origin.y = selectedCellFrame.size.height - _selectedBarHeight;
+    //selectedBarFrame.size.height = _selectedBarHeight;
     
-    if (animation){
-        [UIView animateWithDuration:0.3 animations:^{
-            self.selectedBar.frame = selectedBarFrame;
-        }];
-    }
-    else{
-        self.selectedBar.frame = selectedBarFrame;
-    }
+    self.selectedBar.frame = selectedBarFrame;
+    
+    [self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
+    
+    return;
+    
+//    if (animation){
+//        [UIView animateWithDuration:0.3 animations:^{
+//            self.selectedBar.frame = selectedBarFrame;
+//        }];
+//    }
+//    else{
+//        self.selectedBar.frame = selectedBarFrame;
+//    }
 }
 
 
@@ -246,26 +202,26 @@
     {
         if (pageScroller == XLPagerScrollOnlyIfOutOfScreen)
         {
-            if  ((selectedCellFrame.origin.x  >= self.view.contentOffset.x)
-                 && (selectedCellFrame.origin.x < (self.view.contentOffset.x + self.frame.size.width - self.view.contentInset.left))){
+            if  ((selectedCellFrame.origin.x  >= self.collectionNode.view.contentOffset.x)
+                 && (selectedCellFrame.origin.x < (self.collectionNode.view.contentOffset.x + self.collectionNode.frame.size.width - self.collectionNode.view.contentInset.left))){
                 return;
             }
         }
         
         CGFloat targetContentOffset = 0;
         // Only bother calculating the contentOffset if there are sufficient tabs that the bar can actually scroll!
-        if (self.view.contentSize.width > self.frame.size.width)
+        if (self.collectionNode.view.contentSize.width > self.collectionNode.frame.size.width)
         {
             targetContentOffset = [self contentOffsetForCellWithFrame:selectedCellFrame index:toIndex];
         }
         
-        [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
+        [self.collectionNode.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
     }
 }
 
 - (CGFloat)contentOffsetForCellWithFrame:(CGRect)cellFrame index:(NSUInteger)index
 {
-    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionViewLayout).sectionInset;
+    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionNode.collectionViewLayout).sectionInset;
     
     CGFloat alignmentOffset = 0;
     
@@ -278,20 +234,20 @@
         }
         case XLSelectedBarAlignmentRight:
         {
-            alignmentOffset = self.frame.size.width - sectionInset.right - cellFrame.size.width;
+            alignmentOffset = self.collectionNode.frame.size.width - sectionInset.right - cellFrame.size.width;
             break;
         }
         case XLSelectedBarAlignmentCenter:
         {
-            alignmentOffset = (self.frame.size.width - cellFrame.size.width) * 0.5;
+            alignmentOffset = (self.collectionNode.frame.size.width - cellFrame.size.width) * 0.5;
             break;
         }
         case XLSelectedBarAlignmentProgressive:
         {
             CGFloat cellHalfWidth = cellFrame.size.width * 0.5;
             CGFloat leftAlignmentOffest = sectionInset.left + cellHalfWidth;
-            CGFloat rightAlignmentOffset = self.frame.size.width - sectionInset.right - cellHalfWidth;
-            NSInteger numberOfItems = [self.dataSource collectionNode:self numberOfItemsInSection:0];
+            CGFloat rightAlignmentOffset = self.collectionNode.frame.size.width - sectionInset.right - cellHalfWidth;
+            NSInteger numberOfItems = [self.collectionNode.dataSource collectionNode:self.collectionNode numberOfItemsInSection:0];
             CGFloat progress = index / (CGFloat)(numberOfItems - 1);
             alignmentOffset = leftAlignmentOffest + ((rightAlignmentOffset - leftAlignmentOffest) * progress) - cellHalfWidth;
             break;
@@ -303,7 +259,7 @@
     // Ensure that the contentOffset wouldn't scroll the UICollectioView passed the beginning
     contentOffset = MAX(0, contentOffset);
     // Ensure that the contentOffset wouldn't scroll the UICollectioView passed the end
-    contentOffset = MIN(self.view.contentSize.width - self.frame.size.width, contentOffset);
+    contentOffset = MIN(self.collectionNode.view.contentSize.width - self.collectionNode.frame.size.width, contentOffset);
     
     return contentOffset;
 }

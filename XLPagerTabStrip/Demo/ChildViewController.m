@@ -17,7 +17,19 @@
 - (instancetype)init {
     self = [super initWithNode:[[ASDisplayNode alloc] init]];
     if(self) {
-        self.node.backgroundColor = [UIColor randomFlatColor];
+        self.node.automaticallyManagesSubnodes = YES;
+        
+        self.node.backgroundColor = [UIColor colorWithRandomFlatColorOfShadeStyle:UIShadeStyleDark];
+        
+        self.labelTextNode = [[ASTextNode alloc] init];
+        
+        __weak typeof(self) weakSelf = self;
+        
+        self.node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+            return [ASCenterLayoutSpec centerLayoutSpecWithCenteringOptions:ASCenterLayoutSpecCenteringXY
+                                                              sizingOptions:ASCenterLayoutSpecSizingOptionDefault
+                                                                      child:weakSelf.labelTextNode];
+        };
     }
     return self;
 }
@@ -36,7 +48,7 @@
 
 -(NSString *)titleForPagerTabStripViewController:(XLPagerTabStripViewController *)pagerTabStripViewController
 {
-    return @"View";
+    return self.labelTextNode.attributedText.string;
 }
 
 -(UIColor *)colorForPagerTabStripViewController:(XLPagerTabStripViewController *)pagerTabStripViewController
