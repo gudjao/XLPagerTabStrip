@@ -154,33 +154,19 @@
     UICollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:selectedCellIndexPath];
     CGRect selectedCellFrame = attributes.frame;
     
-    //CGRect cellFrameInSuperview = [collectionView convertRect:theAttributes.frame toView:[collectionView superview]];
-    
-    //CGRect cellFrameInSuperview = [self convertRect:attributes.frame toNode:self.supernode];
-    //CGRect frameTest = [self convertRect:attributes.frame toNode:self];
-    //CGRect frameTest = [self convertRect:attributes.frame toNode:nil];
-    
     [self scrollToItemAtIndexPath:selectedCellIndexPath
                  atScrollPosition:UICollectionViewScrollPositionNone
                          animated:YES];
-    
-    //selectedCellFrame = frameTest;
     
     //[self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
     
     selectedBarFrame.size.width = selectedCellFrame.size.width;
     selectedBarFrame.origin.x = selectedCellFrame.origin.x;
-    //selectedBarFrame.origin.y = selectedCellFrame.size.height - _selectedBarHeight;
-    //selectedBarFrame.size.height = _selectedBarHeight;
     
     self.selectedBar.frame = selectedBarFrame;
     
-    NSLog(@"Moving");
-    
     [self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
 }
-
-
 
 #pragma mark - Helpers
 
