@@ -2,6 +2,7 @@ PODS:
   - ChameleonFramework (2.1.0):
     - ChameleonFramework/Default (= 2.1.0)
   - ChameleonFramework/Default (2.1.0)
+  - GDPerformanceView (1.3.1)
   - PINCache (3.0.1-beta.4):
     - PINCache/Arc-exception-safe (= 3.0.1-beta.4)
     - PINCache/Core (= 3.0.1-beta.4)
@@ -27,6 +28,7 @@ PODS:
 
 DEPENDENCIES:
   - ChameleonFramework
+  - GDPerformanceView
   - Texture (from `~/Desktop/Libraries/Texture`)
 
 EXTERNAL SOURCES:
@@ -35,11 +37,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
+  GDPerformanceView: d70d646bf7022a3dfd64222e4966f403bfffef19
   PINCache: a89c8f609232afac77128557bd12c861844423d7
   PINOperation: ac23db44796d4a564ecf9b5ea7163510f579b71d
   PINRemoteImage: e4e02e15a6f96cedbcef2abf1c9c1228dc9897d7
   Texture: 18664254419f35de27af76399b3b265cbad5740a
 
-PODFILE CHECKSUM: dcee1f7966a2f0b0e183a361a82cd24e7116893c
+PODFILE CHECKSUM: b2de35bc699466fa560c175f4c69d2e7c6ae3d1e
 
 COCOAPODS: 1.2.1

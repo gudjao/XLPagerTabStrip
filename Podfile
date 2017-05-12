@@ -7,6 +7,9 @@ target 'XLPagerTabStrip' do
 	pod 'Texture', :path => '~/Desktop/Libraries/Texture'
     pod 'ChameleonFramework'
     
+    # Performance Monitor
+    pod 'GDPerformanceView'
+    
   # Pods for XLPagerTabStrip
 
   target 'XLPagerTabStripTests' do

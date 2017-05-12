@@ -32,10 +32,15 @@
 
 #import "SampleViewController.h"
 
+#import <GDPerformanceView/GDPerformanceMonitor.h>
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Performance Monitor
+    [[GDPerformanceMonitor sharedInstance] startMonitoring];
+    
     SampleViewController *mainController = [[SampleViewController alloc] init];
     mainController.edgesForExtendedLayout = UIRectEdgeNone;
     
