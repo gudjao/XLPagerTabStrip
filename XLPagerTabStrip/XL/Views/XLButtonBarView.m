@@ -83,7 +83,7 @@
     self.selectedOptionIndex = index;
     
     XLButtonBarViewCell *cell = [self nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:index
-                                                                                                inSection:0]];
+                                                                                 inSection:0]];
     
     // Check if cell node is loaded
     if(cell.isNodeLoaded) {
@@ -124,6 +124,10 @@
     
     self.selectedBar.frame = CGRectMake(targetFrame.origin.x, self.selectedBar.frame.origin.y, targetFrame.size.width, self.selectedBar.frame.size.height);
     
+    CGRect barFrame = self.selectedBar.frame;
+    
+    //[self transitionLayoutWithAnimation:YES shouldMeasureAsync:nil measurementCompletion:nil];
+    
     // Next, calculate and set the contentOffset of the UICollectionView
     // (so it scrolls the selectedBar into the appriopriate place given the self.selectedBarAlignment)
     
@@ -154,35 +158,14 @@
     UICollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:selectedCellIndexPath];
     CGRect selectedCellFrame = attributes.frame;
     
-//    [self scrollToItemAtIndexPath:selectedCellIndexPath
-//                 atScrollPosition:UICollectionViewScrollPositionNone
-//                         animated:YES];
-    
-
-//    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionViewLayout).sectionInset;
-//    
-//    [self.view setContentOffset:CGPointMake(selectedCellFrame.origin.x - sectionInset.right, 0) animated:YES];
-//    
-////    [self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
-    
     selectedBarFrame.size.width = selectedCellFrame.size.width;
     selectedBarFrame.origin.x = selectedCellFrame.origin.x;
     
     self.selectedBar.frame = selectedBarFrame;
     
-    //[self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
-}
-
-- (void)didCompleteLayoutTransition:(id<ASContextTransitioning>)context {
-//    NSLog(@"Did complete layout transition");
-//
-//    CGRect finalNameFrame = [context finalFrameForNode:self.selectedBar];
-//    
-//    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionViewLayout).sectionInset;
-//    
-//    [UIView animateWithDuration:0.5f animations:^{
-//        [self.view setContentOffset:CGPointMake(finalNameFrame.origin.x - sectionInset.right, 0) animated:YES];
-//    }];
+    [self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
+    
+    [self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
 }
 
 #pragma mark - Helpers
@@ -206,7 +189,9 @@
             targetContentOffset = [self contentOffsetForCellWithFrame:selectedCellFrame index:toIndex];
         }
         
-        [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:YES];
+        });
     }
 }
 

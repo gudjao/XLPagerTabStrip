@@ -19,7 +19,7 @@
     [super viewDidLoad];
     
     // Do any additional setup after loading the view.
-    self.isProgressiveIndicator = NO;
+    self.isProgressiveIndicator = YES;
 }
 
 #pragma mark - XLPagerTabStripViewControllerDataSource
