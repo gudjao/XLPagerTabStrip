@@ -66,7 +66,7 @@
         
         UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
         flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 25, 0, 25);
         
         _buttonBarView = [[XLButtonBarView alloc] initWithCollectionViewLayout:flowLayout];
         _buttonBarView.backgroundColor = [UIColor orangeColor];

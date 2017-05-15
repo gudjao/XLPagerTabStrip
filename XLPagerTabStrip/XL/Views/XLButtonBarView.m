@@ -154,18 +154,35 @@
     UICollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:selectedCellIndexPath];
     CGRect selectedCellFrame = attributes.frame;
     
-    [self scrollToItemAtIndexPath:selectedCellIndexPath
-                 atScrollPosition:UICollectionViewScrollPositionNone
-                         animated:YES];
+//    [self scrollToItemAtIndexPath:selectedCellIndexPath
+//                 atScrollPosition:UICollectionViewScrollPositionNone
+//                         animated:YES];
     
-    //[self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
+
+//    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionViewLayout).sectionInset;
+//    
+//    [self.view setContentOffset:CGPointMake(selectedCellFrame.origin.x - sectionInset.right, 0) animated:YES];
+//    
+////    [self updateContentOffsetAnimated:animation pagerScroll:pagerScroll toFrame:selectedCellFrame toIndex:selectedCellIndexPath.row];
     
     selectedBarFrame.size.width = selectedCellFrame.size.width;
     selectedBarFrame.origin.x = selectedCellFrame.origin.x;
     
     self.selectedBar.frame = selectedBarFrame;
     
-    [self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
+    //[self transitionLayoutWithAnimation:animation shouldMeasureAsync:nil measurementCompletion:nil];
+}
+
+- (void)didCompleteLayoutTransition:(id<ASContextTransitioning>)context {
+//    NSLog(@"Did complete layout transition");
+//
+//    CGRect finalNameFrame = [context finalFrameForNode:self.selectedBar];
+//    
+//    UIEdgeInsets sectionInset = ((UICollectionViewFlowLayout *)self.collectionViewLayout).sectionInset;
+//    
+//    [UIView animateWithDuration:0.5f animations:^{
+//        [self.view setContentOffset:CGPointMake(finalNameFrame.origin.x - sectionInset.right, 0) animated:YES];
+//    }];
 }
 
 #pragma mark - Helpers
