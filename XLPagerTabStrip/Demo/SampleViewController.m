@@ -35,16 +35,16 @@
     childA.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child A"
                                                                           attributes:attrsText];
     ChildViewController *childB = [[ChildViewController alloc] init];
-    childB.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child B"
+    childB.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child B TEST"
                                                                           attributes:attrsText];
     ChildViewController *childC = [[ChildViewController alloc] init];
     childC.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child C"
                                                                           attributes:attrsText];
     ChildViewController *childD = [[ChildViewController alloc] init];
-    childD.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child D"
+    childD.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child D TEST LONG"
                                                                           attributes:attrsText];
     ChildViewController *childE = [[ChildViewController alloc] init];
-    childE.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child E"
+    childE.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child E TEST"
                                                                           attributes:attrsText];
     ChildViewController *childF = [[ChildViewController alloc] init];
     childF.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child F"

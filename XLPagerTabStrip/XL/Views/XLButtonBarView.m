@@ -48,7 +48,6 @@
         self.selectedBar = [[ASDisplayNode alloc] init];
         self.selectedBar.layer.zPosition = 99999;
         self.selectedBar.backgroundColor = [UIColor yellowColor];
-        self.selectedBar.frame = CGRectMake(35, 44.0f - _selectedBarHeight, 0, _selectedBarHeight);
     };
     return self;
 }
@@ -68,11 +67,11 @@
 }
 
 - (void)animateLayoutTransition:(id<ASContextTransitioning>)context {
-    CGRect initialNameFrame = [context initialFrameForNode:self.selectedBar];
-    self.selectedBar.frame = initialNameFrame;
-    [UIView animateWithDuration:0.4 animations:^{
-        CGRect finalNameFrame = [context finalFrameForNode:self.selectedBar];
-        self.selectedBar.frame = finalNameFrame;
+    CGRect initialSelectedBarFrame = [context initialFrameForNode:self.selectedBar];
+    self.selectedBar.frame = initialSelectedBarFrame;
+    [UIView animateWithDuration:0.3 animations:^{
+        CGRect finalSelectedBarFrame = [context finalFrameForNode:self.selectedBar];
+        self.selectedBar.frame = finalSelectedBarFrame;
     } completion:^(BOOL finished) {
         [context completeTransition:finished];
     }];
@@ -124,9 +123,7 @@
     
     self.selectedBar.frame = CGRectMake(targetFrame.origin.x, self.selectedBar.frame.origin.y, targetFrame.size.width, self.selectedBar.frame.size.height);
     
-    CGRect barFrame = self.selectedBar.frame;
-    
-    //[self transitionLayoutWithAnimation:YES shouldMeasureAsync:nil measurementCompletion:nil];
+    [self transitionLayoutWithAnimation:YES shouldMeasureAsync:nil measurementCompletion:nil];
     
     // Next, calculate and set the contentOffset of the UICollectionView
     // (so it scrolls the selectedBar into the appriopriate place given the self.selectedBarAlignment)
@@ -146,8 +143,11 @@
     // scrolled the XLButtonBarView and then subsequently scrolled the UIPageViewController)
     // Alternatively if the fromIndex and toIndex are the same then this is the last call to this method in the
     // progression so as a precaution always animate this contentOffest change
-    BOOL animated = (ABS(self.view.contentOffset.x - targetContentOffset) > 30) || (fromIndex == toIndex);
-    [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL animated = (ABS(self.view.contentOffset.x - targetContentOffset) > 30) || (fromIndex == toIndex);
+        [self.view setContentOffset:CGPointMake(targetContentOffset, 0) animated:animated];
+    });
 }
 
 -(void)updateSelectedBarPositionWithAnimation:(BOOL)animation swipeDirection:(XLPagerTabStripDirection __unused)swipeDirection pagerScroll:(XLPagerScroll)pagerScroll
@@ -160,6 +160,8 @@
     
     selectedBarFrame.size.width = selectedCellFrame.size.width;
     selectedBarFrame.origin.x = selectedCellFrame.origin.x;
+    selectedBarFrame.origin.y = self.frame.size.height - _selectedBarHeight;
+    selectedBarFrame.size.height = _selectedBarHeight;
     
     self.selectedBar.frame = selectedBarFrame;
     
@@ -239,24 +241,5 @@
     
     return contentOffset;
 }
-
-#pragma mark - Properties
-
-- (void)setSelectedBarHeight:(CGFloat)selectedBarHeight
-{
-    _selectedBarHeight = selectedBarHeight;
-    _selectedBar.frame = CGRectMake(_selectedBar.frame.origin.x, self.frame.size.height - _selectedBarHeight, _selectedBar.frame.size.width, _selectedBarHeight);
-}
-
-//- (ASDisplayNode *)selectedBar
-//{
-//    if (!_selectedBar) {
-//        //_selectedBar = [[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height - _selectedBarHeight, 0, _selectedBarHeight)];
-//        _selectedBar = [[ASDisplayNode alloc] init];
-//        _selectedBar.layer.zPosition = 9999;
-//        _selectedBar.backgroundColor = [UIColor blackColor];
-//    }
-//    return _selectedBar;
-//}
 
 @end
