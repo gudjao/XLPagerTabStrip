@@ -43,6 +43,11 @@
     
     SampleViewController *mainController = [[SampleViewController alloc] init];
     mainController.edgesForExtendedLayout = UIRectEdgeNone;
+    mainController.pagerTabMarginLeftRight = 0.0f;
+    mainController.fitAllChildren = YES;
+    
+    [(UICollectionViewFlowLayout *)mainController.buttonBarView.collectionViewLayout setMinimumInteritemSpacing:0.0f];
+    [(UICollectionViewFlowLayout *)mainController.buttonBarView.collectionViewLayout setMinimumLineSpacing:0.0f];
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:mainController];
     navController.title = @"Texture Sample";

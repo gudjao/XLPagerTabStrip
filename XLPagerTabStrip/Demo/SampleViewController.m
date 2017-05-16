@@ -19,7 +19,7 @@
     [super viewDidLoad];
     
     // Do any additional setup after loading the view.
-    self.isProgressiveIndicator = YES;
+    self.isProgressiveIndicator = NO;
 }
 
 #pragma mark - XLPagerTabStripViewControllerDataSource
@@ -50,7 +50,8 @@
     childF.labelTextNode.attributedText = [[NSAttributedString alloc] initWithString:@"Child F"
                                                                           attributes:attrsText];
     
-    return @[childA, childB, childC, childD, childE, childF];
+    return @[childA, childB, childC, childD];
+    //return @[childA, childB, childC, childD, childE, childF];
 }
 
 - (void)didReceiveMemoryWarning {

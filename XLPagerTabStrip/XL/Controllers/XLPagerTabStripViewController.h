@@ -92,7 +92,12 @@ typedef NS_ENUM(NSUInteger, XLPagerTabStripDirection) {
 @property (nonatomic, assign) id<XLPagerTabStripViewControllerDelegate> delegate;
 @property (nonatomic, assign) id<XLPagerTabStripViewControllerDataSource> dataSource;
 
+@property (nonatomic, assign) NSUInteger pagerTabMarginLeftRight;
+@property (nonatomic, assign) BOOL fitAllChildren;
+
 @property (readonly) NSUInteger currentIndex;
+@property (readonly) NSUInteger previousIndex;
+
 @property BOOL skipIntermediateViewControllers;
 @property BOOL isProgressiveIndicator;
 @property BOOL isElasticIndicatorLimit;

@@ -29,6 +29,7 @@
 
 @property (readonly) NSArray *pagerTabStripChildViewControllersForScrolling;
 @property (nonatomic) NSUInteger currentIndex;
+@property (nonatomic) NSUInteger previousIndex;
 
 @end
 
@@ -72,6 +73,8 @@
         self.node.automaticallyManagesSubnodes = YES;
         self.node.backgroundColor = [UIColor lightGrayColor];
         
+        self.fitAllChildren = 0;
+        
         [self pagerTabStripViewControllerInit];
         
         ASPagerFlowLayout *flowLayout = [[ASPagerFlowLayout alloc] init];
@@ -95,12 +98,14 @@
 
 - (NSInteger)numberOfPagesInPagerNode:(ASPagerNode *)pagerNode
 {
-    return self.pagerTabStripChildViewControllersForScrolling.count;
+    NSLog(@"Children: %lu", (unsigned long)_pagerTabStripChildViewControllersForScrolling.count);
+    
+    return _pagerTabStripChildViewControllersForScrolling.count;
 }
 
 - (ASCellNodeBlock)pagerNode:(ASPagerNode *)pagerNode nodeBlockAtIndex:(NSInteger)index
 {
-    id childViewController = [self.pagerTabStripChildViewControllersForScrolling objectAtIndex:index];
+    id childViewController = [_pagerTabStripChildViewControllersForScrolling objectAtIndex:index];
     
     return ^{
         ASCellNode *cellNode = [[ASCellNode alloc] initWithViewControllerBlock:^UIViewController * _Nonnull {
@@ -141,6 +146,7 @@
     
     if (self.dataSource){
         _pagerTabStripChildViewControllers = [self.dataSource childViewControllersForPagerTabStripViewController:self];
+        _pagerTabStripChildViewControllersForScrolling = _pagerTabStripChildViewControllers;
     }
     
     //self.containerPagerNode.clipsToBounds = YES;
@@ -197,33 +203,72 @@
 
 -(void)moveToViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated
 {
+    NSLog(@"Select Index: %lu", index);
+    
     if (!self.isViewLoaded || !self.view.window){
         self.currentIndex = index;
     }
     else{
-        if (animated && self.skipIntermediateViewControllers && ABS(self.currentIndex - index) > 1){
-            NSMutableArray * tempChildViewControllers = [NSMutableArray arrayWithArray:self.pagerTabStripChildViewControllers];
-            UIViewController *currentChildVC = [self.pagerTabStripChildViewControllers objectAtIndex:self.currentIndex];
-            NSUInteger fromIndex = (self.currentIndex < index) ? index - 1 : index + 1;
-            UIViewController *fromChildVC = [self.pagerTabStripChildViewControllers objectAtIndex:fromIndex];
-            [tempChildViewControllers setObject:fromChildVC atIndexedSubscript:self.currentIndex];
-            [tempChildViewControllers setObject:currentChildVC atIndexedSubscript:fromIndex];
-            _pagerTabStripChildViewControllersForScrolling = tempChildViewControllers;
+        
+        //[self.containerPagerNode scrollToPageAtIndex:index animated:YES];
+        //return;
+        dispatch_async(dispatch_get_main_queue(), ^{
+        if (animated && self.skipIntermediateViewControllers) { //&& ABS(self.currentIndex - index) > 1
+            NSMutableArray * tempChildViewControllers = [NSMutableArray arrayWithArray:_pagerTabStripChildViewControllersForScrolling];
+
+            __weak typeof(self) weakSelf = self;
+            
+            self.previousIndex = self.currentIndex;
+            self.currentIndex = index;
+            
+            [self.containerPagerNode performBatchAnimated:YES
+                                                  updates:^
+             {
+                 NSMutableArray *deleteIndexPaths = [NSMutableArray array];
+                 NSMutableIndexSet *deleteIndexSet = [[NSMutableIndexSet alloc] init];
+                 
+                 for (int x = 0; weakSelf.pagerTabStripChildViewControllersForScrolling.count > x; x++) {
+                     if(x != weakSelf.previousIndex && x != index) {
+                         //NSLog(@"X: %d Current: %lu New: %lu", x, (unsigned long)self.currentIndex, (unsigned long)index);
+                         
+                         [deleteIndexPaths addObject:[NSIndexPath indexPathForItem:x inSection:0]];
+                         
+                         [deleteIndexSet addIndex:x];
+                     }
+                 }
+                 
+                 [tempChildViewControllers removeObjectsAtIndexes:deleteIndexSet];
+                 
+                 _pagerTabStripChildViewControllersForScrolling = tempChildViewControllers;
+                 
+                 [weakSelf.containerPagerNode deleteItemsAtIndexPaths:deleteIndexPaths];
+             } completion:^(BOOL finished) {
+                 if(weakSelf.previousIndex < index) {
+                     NSLog(@"SCROLL 1");
+                     [weakSelf.containerPagerNode scrollToPageAtIndex:1 animated:YES];
+                 } else {
+                     NSLog(@"SCROLL 0");
+                     [weakSelf.containerPagerNode scrollToPageAtIndex:0 animated:YES];
+                 }
+             }];
+            
+            //[self.containerPagerNode scrollToPageAtIndex:index animated:YES];
+            
             //            [self.containerPagerNode.view setContentOffset:CGPointMake([self pageOffsetForChildIndex:fromIndex], 0) animated:NO];
-            if (self.navigationController){
-                self.navigationController.view.userInteractionEnabled = NO;
-            }
-            else{
-                self.node.userInteractionEnabled = NO;
-            }
-            [self.containerPagerNode scrollToPageAtIndex:index animated:YES];
+            //            if (self.navigationController){
+            //                self.navigationController.view.userInteractionEnabled = NO;
+            //            }
+            //            else{
+            //                self.node.userInteractionEnabled = NO;
+            //            }
+            
             //            [self.containerPagerNode.view setContentOffset:CGPointMake([self pageOffsetForChildIndex:index], 0) animated:YES];
         }
         else{
             [self.containerPagerNode scrollToPageAtIndex:index animated:animated];
             //            [self.containerPagerNode.view setContentOffset:CGPointMake([self pageOffsetForChildIndex:index], 0) animated:animated];
         }
-        
+        });
     }
 }
 
@@ -351,6 +396,8 @@
 
 -(void)updateContent
 {
+    return;
+    
     if (!CGSizeEqualToSize(_lastSize, self.containerPagerNode.bounds.size)){
         if (_lastSize.width != self.containerPagerNode.bounds.size.width){
             _lastSize = self.containerPagerNode.bounds.size;
@@ -366,6 +413,37 @@
     
     NSArray * childViewControllers = self.pagerTabStripChildViewControllersForScrolling;
     self.containerPagerNode.view.contentSize = CGSizeMake(CGRectGetWidth(self.containerPagerNode.bounds) * childViewControllers.count, self.containerPagerNode.view.contentSize.height);
+    
+    //    [childViewControllers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    //        UIViewController * childController = (UIViewController *)obj;
+    //        CGFloat pageOffsetForChild = [self pageOffsetForChildIndex:idx];
+    //        if (fabs(self.containerPagerNode.view.contentOffset.x - pageOffsetForChild) < CGRectGetWidth(self.containerPagerNode.bounds)) {
+    //            if (![childController parentViewController]) { // Add child
+    //                [self addChildViewController:childController];
+    //                [childController didMoveToParentViewController:self];
+    //
+    //                CGFloat childPosition = [self offsetForChildIndex:idx];
+    //                [childController.view setFrame:CGRectMake(childPosition, 0, MIN(CGRectGetWidth(self.view.bounds), CGRectGetWidth(self.containerPagerNode.bounds)), CGRectGetHeight(self.containerPagerNode.bounds))];
+    //                childController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    //
+    //                [childController beginAppearanceTransition:YES animated:NO];
+    //                [self.containerPagerNode.view addSubview:childController.view];
+    //                [childController endAppearanceTransition];
+    //            } else {
+    //                CGFloat childPosition = [self offsetForChildIndex:idx];
+    //                [childController.view setFrame:CGRectMake(childPosition, 0, MIN(CGRectGetWidth(self.view.bounds), CGRectGetWidth(self.containerPagerNode.bounds)), CGRectGetHeight(self.containerPagerNode.bounds))];
+    //                childController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    //            }
+    //        } else {
+    //            if ([childController parentViewController]) { // Remove child
+    //                [childController willMoveToParentViewController:nil];
+    //                [childController beginAppearanceTransition:NO animated:NO];
+    //                [childController.view removeFromSuperview];
+    //                [childController endAppearanceTransition];
+    //                [childController removeFromParentViewController];
+    //            }
+    //        }
+    //    }];
     
     NSUInteger oldCurrentIndex = self.currentIndex;
     NSInteger virtualPage = [self virtualPageForContentOffset:self.containerPagerNode.view.contentOffset.x];
@@ -447,24 +525,64 @@
 
 #pragma mark - UIScrollViewDelegte
 
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    if (self.containerPagerNode.view == scrollView){
-        [self updateContent];
-    }
-}
-
-
--(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-    if (self.containerPagerNode.view == scrollView){
-        _lastPageNumber = [self pageForContentOffset:scrollView.contentOffset.x];
-        _lastContentOffset = scrollView.contentOffset.x;
-    }
-}
+//-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+//{
+//    if (self.containerPagerNode.view == scrollView){
+//        [self updateContent];
+//    }
+//}
+//
+//
+//-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+//{
+//    if (self.containerPagerNode.view == scrollView){
+//        _lastPageNumber = [self pageForContentOffset:scrollView.contentOffset.x];
+//        _lastContentOffset = scrollView.contentOffset.x;
+//    }
+//}
 
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
+    NSLog(@"Did End Scroll");
+    
+    //return;
+    
+    _pagerTabStripChildViewControllers = [self.dataSource childViewControllersForPagerTabStripViewController:self];
+    
+    __weak typeof(self) weakSelf = self;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+    [self.containerPagerNode performBatchAnimated:YES
+                                          updates:^
+     {
+         NSMutableArray *insertIndexPaths = [NSMutableArray array];
+         //NSMutableIndexSet *deleteIndexSet = [[NSMutableIndexSet alloc] init];
+         
+         for (int x = 0; _pagerTabStripChildViewControllers.count > x; x++) {
+             if(x != weakSelf.currentIndex && x != weakSelf.previousIndex) {
+                 //NSLog(@"X: %d Current: %lu Previous: %lu", x, (unsigned long)weakSelf.currentIndex, (unsigned long)weakSelf.previousIndex);
+                 
+                 [insertIndexPaths addObject:[NSIndexPath indexPathForItem:x inSection:0]];
+                 
+                 //[deleteIndexSet addIndex:x];
+             }
+         }
+         
+         _pagerTabStripChildViewControllersForScrolling = _pagerTabStripChildViewControllers;
+         
+         [weakSelf.containerPagerNode insertItemsAtIndexPaths:insertIndexPaths];
+     } completion:^(BOOL finished) {
+         if (self.navigationController){
+             self.navigationController.view.userInteractionEnabled = YES;
+         }
+         else{
+             self.node.userInteractionEnabled = YES;
+         }
+     }];
+    });
+    
+    return;
+    
     if (self.containerPagerNode.view == scrollView && _pagerTabStripChildViewControllersForScrolling){
         _pagerTabStripChildViewControllersForScrolling = nil;
         

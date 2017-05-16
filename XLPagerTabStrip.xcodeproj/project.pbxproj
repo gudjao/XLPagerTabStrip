@@ -255,8 +255,8 @@
 			isa = PBXGroup;
 			children = (
 				B04065001EC04C120089037E /* Main Controller */,
-				28B63AE81A45B26600225C66 /* XLBarPagerTabStripViewController.m */,
 				28B63AE71A45B26600225C66 /* XLBarPagerTabStripViewController.h */,
+				28B63AE81A45B26600225C66 /* XLBarPagerTabStripViewController.m */,
 				28B63AE91A45B26600225C66 /* XLButtonBarPagerTabStripViewController.h */,
 				28B63AEA1A45B26600225C66 /* XLButtonBarPagerTabStripViewController.m */,
 				28B63AED1A45B26600225C66 /* XLSegmentedPagerTabStripViewController.h */,

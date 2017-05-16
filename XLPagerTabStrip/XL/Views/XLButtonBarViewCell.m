@@ -39,7 +39,7 @@
     if(self) {
         // Auto add subnodes
         self.automaticallyManagesSubnodes = YES;
-        
+    
         _label = [[ASTextNode alloc] init];
         _label.maximumNumberOfLines = 1;
         
@@ -72,7 +72,7 @@
 //                                                                        alignItems:ASStackLayoutAlignItemsStretch
 //                                                                          children:@[ratioProfile,
 //                                                                                     stackContent]];
-    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(10.0f, 12.0f, 12.0f, 12.0f)
+    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(11.0f, 8.0f, 6.0f, 8.0f)
                                                   child:_label];
 }
 
