@@ -84,11 +84,11 @@ typedef NS_ENUM(NSUInteger, XLPagerTabStripDirection) {
 
 
 
-@interface XLPagerTabStripViewController : ASViewController <XLPagerTabStripViewControllerDelegate, XLPagerTabStripViewControllerDataSource, UIScrollViewDelegate, ASPagerDelegate, ASPagerDataSource, ASCollectionDelegate>
+@interface XLPagerTabStripViewController : ASViewController <XLPagerTabStripViewControllerDelegate, XLPagerTabStripViewControllerDataSource, UIScrollViewDelegate>
 
 // Properties
 @property (readonly) NSArray * pagerTabStripChildViewControllers;
-@property (nonatomic, retain) ASPagerNode * containerPagerNode;
+@property (nonatomic, retain) ASScrollNode * containerScrollNode;
 @property (nonatomic, assign) id<XLPagerTabStripViewControllerDelegate> delegate;
 @property (nonatomic, assign) id<XLPagerTabStripViewControllerDataSource> dataSource;
 
@@ -96,7 +96,6 @@ typedef NS_ENUM(NSUInteger, XLPagerTabStripDirection) {
 @property (nonatomic, assign) BOOL fitAllChildren;
 
 @property (readonly) NSUInteger currentIndex;
-@property (readonly) NSUInteger previousIndex;
 
 @property BOOL skipIntermediateViewControllers;
 @property BOOL isProgressiveIndicator;

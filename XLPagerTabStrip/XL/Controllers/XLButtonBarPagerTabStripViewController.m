@@ -79,8 +79,8 @@
         self.node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
             
             weakSelf.buttonBarView.style.preferredSize = CGSizeMake(constrainedSize.max.width, 44.0f);
-            weakSelf.containerPagerNode.style.preferredSize = constrainedSize.max;
-            weakSelf.containerPagerNode.style.flexShrink = 1.0f;
+            weakSelf.containerScrollNode.style.preferredSize = constrainedSize.max;
+            weakSelf.containerScrollNode.style.flexShrink = 1.0f;
             
             ASStackLayoutSpec *buttonViewStack =
             [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionVertical
@@ -88,7 +88,7 @@
                                              justifyContent:ASStackLayoutJustifyContentStart
                                                  alignItems:ASStackLayoutAlignItemsStretch
                                                    children:@[weakSelf.buttonBarView,
-                                                              weakSelf.containerPagerNode]];
+                                                              weakSelf.containerScrollNode]];
             
             return buttonViewStack;
         };
@@ -345,7 +345,7 @@
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     [super scrollViewDidEndScrollingAnimation:scrollView];
-    if (scrollView == self.containerPagerNode.view){
+    if (scrollView == self.containerScrollNode.view){
         self.shouldUpdateButtonBarView = YES;
     }
 }
