@@ -329,7 +329,6 @@
         CGFloat pageOffsetForChild = [self pageOffsetForChildIndex:idx];
         if (fabs(self.containerScrollNode.view.contentOffset.x - pageOffsetForChild) < CGRectGetWidth(self.containerScrollNode.bounds)) {
             if (![childController parentViewController]) { // Add child
-                NSLog(@"Add Child");
                 [self addChildViewController:childController];
                 [childController didMoveToParentViewController:self];
                 
@@ -337,8 +336,12 @@
                 [childController.view setFrame:CGRectMake(childPosition, 0, MIN(CGRectGetWidth(self.view.bounds), CGRectGetWidth(self.containerScrollNode.bounds)), CGRectGetHeight(self.containerScrollNode.bounds))];
                 childController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
                 
-                [childController beginAppearanceTransition:YES animated:NO];
-                [self.containerScrollNode addSubnode:childController.node];
+                [obj beginAppearanceTransition:YES animated:NO];
+                if([childController isKindOfClass:[ASViewController class]]) {
+                    [self.containerScrollNode addSubnode:childController.node];
+                } else {
+                    [self.containerScrollNode.view addSubview:childController.view];
+                }
                 [childController endAppearanceTransition];
             } else {
                 CGFloat childPosition = [self offsetForChildIndex:idx];
@@ -347,10 +350,13 @@
             }
         } else {
             if ([childController parentViewController]) { // Remove child
-                NSLog(@"Remove");
                 [childController willMoveToParentViewController:nil];
                 [childController beginAppearanceTransition:NO animated:NO];
-                [childController.node removeFromSupernode];
+                if([obj isKindOfClass:[ASViewController class]]) {
+                    [childController.node removeFromSupernode];
+                } else {
+                    [childController.view removeFromSuperview];
+                }
                 [childController endAppearanceTransition];
                 [childController removeFromParentViewController];
             }
@@ -418,7 +424,11 @@
         [self.pagerTabStripChildViewControllers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             ASViewController * childController = (ASViewController *)obj;
             if ([childController parentViewController]){
-                [childController.view removeFromSuperview];
+                if([obj isKindOfClass:[ASViewController class]]) {
+                    [childController.node removeFromSupernode];
+                } else {
+                    [childController.view removeFromSuperview];
+                }
                 [childController willMoveToParentViewController:nil];
                 [childController removeFromParentViewController];
             }
