@@ -311,9 +311,10 @@
                                     NSParagraphStyleAttributeName : paragraphStyle
                                     };
         
-        NSLog(@"%@", attrsText);
         buttonBarCell.textAttributes = attrsText;
         buttonBarCell.text = [childController titleForPagerTabStripViewController:self];
+        
+        buttonBarCell.textInsets = UIEdgeInsetsMake(5.0f + self.buttonBarView.selectedBarHeight, 10.0f, 5.0f, 10.0f);
         
         if (self.isProgressiveIndicator) {
             if (self.changeCurrentIndexProgressiveBlock) {
