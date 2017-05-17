@@ -25,9 +25,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface XLButtonBarViewCell : ASCellNode
-
-@property (readonly, nonatomic) ASImageNode * imageView;
-@property (readonly, nonatomic) ASTextNode * label;
+@interface XLButtonBarViewCell : ASTextCellNode
 
 @end

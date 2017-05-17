@@ -27,9 +27,6 @@
 
 @interface XLButtonBarViewCell()
 
-@property ASImageNode * imageView;
-@property ASTextNode * label;
-
 @end
 
 @implementation XLButtonBarViewCell
@@ -37,43 +34,9 @@
 - (instancetype)init {
     self = [super init];
     if(self) {
-        // Auto add subnodes
-        self.automaticallyManagesSubnodes = YES;
-    
-        _label = [[ASTextNode alloc] init];
-        _label.maximumNumberOfLines = 1;
-        
-        _imageView = [[ASImageNode alloc] init];
+        // Do nothing. just a subclass naming
     }
     return self;
-}
-
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
-//    if(_imageView.image) {
-//    // Label with image
-//    ASStackLayoutSpec *stackContent = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
-//                                                                              spacing:0.0f
-//                                                                       justifyContent:ASStackLayoutJustifyContentStart
-//                                                                           alignItems:ASStackLayoutAlignItemsStretch
-//                                                                             children:@[,
-//                                                                                        ]];
-//    }
-    
-//    // Main
-//    ASRatioLayoutSpec *ratioProfile = [ASRatioLayoutSpec ratioLayoutSpecWithRatio:1.0f
-//                                                                            child:self.profileImageNode];
-//    ratioProfile.style.width = ASDimensionMakeWithPoints(54.0f);
-//    
-//    stackContent.style.flexShrink = 1.0f;
-//    
-//    ASStackLayoutSpec *stackMain = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
-//                                                                           spacing:12.0f
-//                                                                    justifyContent:ASStackLayoutJustifyContentStart
-//                                                                        alignItems:ASStackLayoutAlignItemsStretch
-//                                                                          children:@[ratioProfile,
-//                                                                                     stackContent]];
-    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(11.0f, 8.0f, 6.0f, 8.0f)
-                                                  child:_label];
 }
 
 @end

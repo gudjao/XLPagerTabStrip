@@ -102,7 +102,7 @@
 {
     [super viewDidLoad];
     
-    self.buttonBarView.labelFont = [UIFont boldSystemFontOfSize:18.0f];
+    self.buttonBarView.labelFont = [UIFont boldSystemFontOfSize:16.0f];
     self.buttonBarView.leftRightMargin = 8;
     self.buttonBarView.view.scrollsToTop = NO;
     self.buttonBarView.view.showsHorizontalScrollIndicator = NO;
@@ -302,7 +302,7 @@
         if (self.buttonBarView.labelFont) {
             labelFont = self.buttonBarView.labelFont;
         } else {
-            labelFont = [UIFont systemFontOfSize:14.0f weight:UIFontWeightMedium];
+            labelFont = [UIFont systemFontOfSize:12.0f weight:UIFontWeightMedium];
         }
         
         NSDictionary *attrsText = @{
@@ -311,19 +311,9 @@
                                     NSParagraphStyleAttributeName : paragraphStyle
                                     };
         
-        buttonBarCell.label.attributedText = [[NSAttributedString alloc] initWithString:[childController titleForPagerTabStripViewController:self]
-                                                                             attributes:attrsText];
-        
-        // Image
-        if ([childController respondsToSelector:@selector(imageForPagerTabStripViewController:)]) {
-            UIImage *image = [childController imageForPagerTabStripViewController:self];
-            buttonBarCell.imageView.image = image;
-        }
-        
-        if ([childController respondsToSelector:@selector(highlightedImageForPagerTabStripViewController:)]) {
-            UIImage *image = [childController highlightedImageForPagerTabStripViewController:self];
-#pragma warning - Deprecate? or Fix?
-        }
+        NSLog(@"%@", attrsText);
+        buttonBarCell.textAttributes = attrsText;
+        buttonBarCell.text = [childController titleForPagerTabStripViewController:self];
         
         if (self.isProgressiveIndicator) {
             if (self.changeCurrentIndexProgressiveBlock) {
