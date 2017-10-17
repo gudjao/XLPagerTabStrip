@@ -71,11 +71,11 @@
         [self.view addSubview:self.buttonBarView];
     }
     
-    if (!self.buttonBarView.delegate){
-        self.buttonBarView.delegate = self;
-    }
     if (!self.buttonBarView.dataSource){
         self.buttonBarView.dataSource = self;
+    }
+    if (!self.buttonBarView.delegate){
+        self.buttonBarView.delegate = self;
     }
     self.buttonBarView.labelFont = [UIFont boldSystemFontOfSize:18.0f];
     self.buttonBarView.leftRightMargin = 8;
@@ -88,7 +88,7 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.buttonBarView layoutIfNeeded];
+    //[self.buttonBarView layoutIfNeeded];
     self.isViewAppearing = YES;
 }
 
@@ -252,18 +252,39 @@
             // In order to determine what needs to stretch and what doesn't we have to recurse through suggestedStetchedCellWidth
             // values (the value decreases with each recursive call) until we find a value that works.
             // The first value to try is the largest (for the case where all the cell widths are equal)
-            CGFloat stetchedCellWidthIfAllEqual = (collectionViewAvailableVisibleWidth - cellSpacingTotal) / numberOfCells;
+            
+            CGFloat stetchedCellWidthIfAllEqual;
+            BOOL isOddWidth = (int)collectionViewAvailableVisibleWidth % 2;
+            
+            if(isOddWidth) {
+                stetchedCellWidthIfAllEqual = ((collectionViewAvailableVisibleWidth - 3.0f) - cellSpacingTotal) / numberOfCells;
+            } else {
+                stetchedCellWidthIfAllEqual = (collectionViewAvailableVisibleWidth - cellSpacingTotal) / numberOfCells;
+            }
             
             CGFloat generalMiniumCellWidth = [self calculateStretchedCellWidths:minimumCellWidths suggestedStetchedCellWidth:stetchedCellWidthIfAllEqual previousNumberOfLargeCells:0];
             
             NSMutableArray *stetchedCellWidths = [[NSMutableArray alloc] init];
             
+            NSUInteger countCellWidths = minimumCellWidths.count;
+            int countX = 0;
+            
             for (NSNumber *minimumCellWidthValue in minimumCellWidths)
             {
                 CGFloat minimumCellWidth = minimumCellWidthValue.floatValue;
                 CGFloat cellWidth = (minimumCellWidth > generalMiniumCellWidth) ? minimumCellWidth : generalMiniumCellWidth;
+                
+                if(isOddWidth) {
+                    if(countX == 0) {
+                        cellWidth += 1.5f;
+                    } else if(countX == countCellWidths - 1) {
+                        cellWidth += 1.5f;
+                    }
+                }
+                
                 NSNumber *cellWidthValue = [NSNumber numberWithFloat:cellWidth];
                 [stetchedCellWidths addObject:cellWidthValue];
+                countX++;
             }
             
             _cachedCellWidths = stetchedCellWidths;
@@ -366,9 +387,9 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     //There's nothing to do if we select the current selected tab
-	if (indexPath.item == self.currentIndex)
-		return;
-	
+    if (indexPath.item == self.currentIndex)
+        return;
+    
     [self.buttonBarView moveToIndex:indexPath.item animated:YES swipeDirection:XLPagerTabStripDirectionNone pagerScroll:XLPagerScrollYES];
     self.shouldUpdateButtonBarView = NO;
     
